@@ -1,0 +1,27 @@
+package test;
+
+message SimpleObject {
+    optional int32 intField = 1;
+    optional sint32 sintField = 2;
+    optional int64 longField = 3;
+    optional sint64 slongField = 4;
+    optional string stringField = 5;
+    optional double doubleField = 6;
+    optional float floatField = 7;
+    optional bytes blobField = 8;
+}
+
+message TextProperty {
+    required string propName = 1;
+    optional string propValue = 2;
+}
+
+message TextProperties {
+    repeated TextProperty prop = 1;
+}
+
+message Tree {
+    optional Tree left = 1;
+    optional Tree right = 2;
+    optional SimpleObject value = 3;
+}
