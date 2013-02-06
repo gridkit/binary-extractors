@@ -48,6 +48,15 @@ public class ProtoBufExtractorSet implements BinaryExtractorSet {
 		}
 	}
 	
+	@Override
+	public void dump(StringBuilder builder) {
+		builder.append("<protobuf-extractor>\n");
+		root.dump(builder);
+		builder.append("</protobuf-extractor>\n");
+	}
+
+
+
 	private class Entry implements Serializable, Comparable<Entry> {
 		
 		private static final long serialVersionUID = 20130127L;
@@ -207,6 +216,31 @@ public class ProtoBufExtractorSet implements BinaryExtractorSet {
 			}
 		}
 		
+		public void dump(StringBuilder builder) {
+			if (composite != null) {
+				builder.append("<extractor-set>\n");
+				composite.dump(builder);
+				builder.append("</extractor-set>\n");
+				for(int i = 0; i != compositeMapping.size(); ++i) {
+					if (compositeMapping.get(i) >= 0) {
+						builder.append("<link id=\"" + i + "\" outIndex=\"" + compositeMapping.get(i)+ "\"/>\n");
+					}
+				}
+			}
+			if (!primitiveSlots.isEmpty() || !childEntries.isEmpty()) {
+				builder.append("<fields>\n");
+				for(PrimitiveSlot slot: primitiveSlots) {
+					String type = slot.encoding.toString().toLowerCase();
+					builder.append("<" + type + " fid=\"" + slot.pbid + "\" outIndex=\"" + slot.outputId + "\"/>\n");
+				}
+				for(Entry child: childEntries.values()) {
+					builder.append("<message fid=\"" + child.pbIndex + "\">\n");
+					child.dump(builder);
+				}				
+				builder.append("</fields>\n");
+			}
+		}
+
 		private void processPrimitives(int pbId, int type, ByteBuffer rootBuffer, int off, int len, ResultVectorReceiver receiver) throws IOException {
 			ByteBuffer target = null;
 			for(PrimitiveSlot slot: getPrimitiveSlots(pbId)) {

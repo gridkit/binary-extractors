@@ -9,11 +9,10 @@ import java.util.Arrays;
 import org.gridkit.data.extractors.common.BinaryExtractor;
 import org.gridkit.data.extractors.common.BinaryExtractorSet;
 import org.gridkit.data.extractors.common.Blob;
-import org.gridkit.data.extractors.common.PushDownBinaryExtractor;
 
 import com.google.protobuf.WireFormat;
 
-public class ProtoBufExtractor<V> implements BinaryExtractor<V>, PushDownBinaryExtractor, Serializable {
+public class ProtoBufExtractor<V> implements BinaryExtractor<V>, Serializable {
 
 	private static final long serialVersionUID = 20130125L;
 
@@ -23,38 +22,38 @@ public class ProtoBufExtractor<V> implements BinaryExtractor<V>, PushDownBinaryE
 		return new ProtoBufExtractor<Blob>(path, Encoding.BLOB);
 	}
 
+	public static ProtoBufExtractor<ByteBuffer> path(int... path) {
+		return newBinaryExtractor(path);
+	}
+
 	public static ProtoBufExtractor<ByteBuffer> newBinaryExtractor(int... path) {
 		return new ProtoBufExtractor<ByteBuffer>(path, Encoding.BINARY);
 	}
 
-	public static ProtoBufExtractor<Integer> newSignedIntegerExtractor(int... path) {
+	public static ProtoBufExtractor<Integer> sint32(int... path) {
 		return new ProtoBufExtractor<Integer>(path, Encoding.SINGNED_INT32);
 	}
 	
-	public static ProtoBufExtractor<Integer> newUnsignedIntegerExtractor(int... path) {
+	public static ProtoBufExtractor<Integer> int32(int... path) {
 		return new ProtoBufExtractor<Integer>(path, Encoding.UNSIGNED_INT32);
 	}
 
-	public static ProtoBufExtractor<Long> newSignedLongExtractor(int... path) {
+	public static ProtoBufExtractor<Long> sint64(int... path) {
 		return new ProtoBufExtractor<Long>(path, Encoding.SINGNED_INT64);
 	}
 	
-	public static ProtoBufExtractor<Long> newUnsignedLongExtractor(int... path) {
+	public static ProtoBufExtractor<Long> int64(int... path) {
 		return new ProtoBufExtractor<Long>(path, Encoding.UNSIGNED_INT64);
 	}
 	
-	public static ProtoBufExtractor<Number> newFloatingPointExtractor(int... path) {
+	public static ProtoBufExtractor<Number> fp(int... path) {
 		return new ProtoBufExtractor<Number>(path, Encoding.FLOATING_POINT);
 	}
 
-	public static ProtoBufExtractor<String> newStringExtractor(int... path) {
+	public static ProtoBufExtractor<String> string(int... path) {
 		return new ProtoBufExtractor<String>(path, Encoding.UTF8);
 	}
 
-	public static <V> ProtoBufExtractor<V> newChainedExtractor(BinaryExtractor<V> nested, int... path) {
-		return new ProtoBufExtractor<V>(path, nested);
-	}
-	
 	enum Encoding implements Encoder {
 		SINGNED_INT32 {
 			@Override
@@ -222,7 +221,7 @@ public class ProtoBufExtractor<V> implements BinaryExtractor<V>, PushDownBinaryE
 		return encoding;
 	}
 	
-	protected BinaryExtractor<?> getNestedExtractor() {
+	protected BinaryExtractor<V> getNestedExtractor() {
 		return nested;
 	}
 
@@ -386,11 +385,25 @@ public class ProtoBufExtractor<V> implements BinaryExtractor<V>, PushDownBinaryE
 	@Override
 	public <VV> BinaryExtractor<VV> pushDown(BinaryExtractor<VV> nested) {
 		if (encoding == Encoding.BINARY) {
-			return new ProtoBufExtractor<VV>(path, nested);
+			if (nested instanceof ProtoBufExtractor) {
+				ProtoBufExtractor<VV> npbe = (ProtoBufExtractor<VV>)nested;
+				int[] newpath = concat(path, npbe.getPath());
+				return new ProtoBufExtractor<VV>(newpath, npbe.getEncoding(), npbe.getNestedExtractor());
+			}
+			else {
+				return new ProtoBufExtractor<VV>(path, nested);
+			}
 		}
 		else {
 			throw new IllegalArgumentException("Cannot push down");
 		}
+	}
+
+	private int[] concat(int[] path1, int[] path2) {
+		int[] npath = new int[path1.length + path2.length];
+		System.arraycopy(path1, 0, npath, 0, path1.length);
+		System.arraycopy(path2, 0, npath, path1.length, path2.length);
+		return npath;
 	}
 
 	interface Encoder {

@@ -11,6 +11,7 @@ import java.util.Map;
 import org.gridkit.data.extractors.common.BinaryExtractor;
 import org.gridkit.data.extractors.common.Blob;
 import org.gridkit.data.extractors.common.CompositeExtractorSet;
+import org.gridkit.data.extractors.common.Extractors;
 import org.gridkit.data.extractors.common.ResultVectorReceiver;
 import org.junit.Assert;
 
@@ -28,6 +29,11 @@ abstract class BaseExtractionAssertTest implements ResultVectorReceiver {
 		resultMap.clear();
 		extractorSet.compile();
 		extractorSet.extractAll(ByteBuffer.wrap(data), this);
+	}
+	
+	protected void dump() {
+		extractorSet.compile();
+		System.out.println(Extractors.dump(extractorSet, 2));
 	}
 	
 	@Override

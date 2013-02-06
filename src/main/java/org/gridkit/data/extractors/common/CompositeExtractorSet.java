@@ -123,6 +123,55 @@ public class CompositeExtractorSet implements BinaryExtractorSet, Serializable {
 		}
 	}
 	
+	public void dump(StringBuilder builder) {
+		if (!compiled) {
+			throw new IllegalStateException("Should be compiled");
+		}
+		builder.append("<composite>\n");
+		if (!batches.isEmpty()) {
+			builder.append("<batches>\n");
+				for(Batch batch: batches) {
+					builder.append("<extractor-set>\n");
+					batch.extractorSet.dump(builder);
+					for(int i = 0; i != batch.outLinks.length; ++i) {
+						if (batch.outLinks[i] != null) {
+							dumpLink(builder, i, batch.outLinks[i]);
+						}
+					}
+					builder.append("</extractor-set>\n");
+				}
+			builder.append("</batches>\n");
+		}
+		if (!compositions.isEmpty()) {
+			builder.append("<compositions>\n");
+			for(int i = 0; i != compositions.size(); ++i) {
+				Composition c = compositions.get(i);
+				builder.append("<composition n=\"" + i + "\">\n");
+				builder.append("<extractor>").append(c.extractor).append("</extractor>\n");
+				dumpLink(builder, Integer.MIN_VALUE, c.outLink);
+				builder.append("</composition>\n");
+			}			
+			builder.append("</compositions>\n");
+		}
+		builder.append("</composite>");
+	}
+	
+	private void dumpLink(StringBuilder builder, int i, ValueLink valueLink) {
+		if (valueLink instanceof ForkLink) {
+			ForkLink fl = (ForkLink) valueLink;
+			dumpLink(builder, i, fl.a);
+			dumpLink(builder, i, fl.b);
+		}
+		else {
+			if (i != Integer.MIN_VALUE) {
+				builder.append("<link n=\"" + i + "\">").append(valueLink).append("</link>\n");
+			}
+			else {
+				builder.append("<link>").append(valueLink).append("</link>\n");
+			}
+		}
+	}
+
 	@Override
 	public void extractAll(ByteBuffer buffer, ResultVectorReceiver resultReceiver) {
 		if (!compiled) {
@@ -141,10 +190,10 @@ public class CompositeExtractorSet implements BinaryExtractorSet, Serializable {
 	
 	private ExtractionContext newContext(ResultVectorReceiver resultVector) {
 		if (compositions.isEmpty()) {
-			return new ExtractionContext(resultVector, Collections.<ValueComposer<?>>emptyList());
+			return new ExtractionContext(resultVector, Collections.<ValueComposer>emptyList());
 		}
 		else {
-			List<ValueComposer<?>> composers = new ArrayList<CompositeExtractor.ValueComposer<?>>(compositions.size());
+			List<ValueComposer> composers = new ArrayList<CompositeExtractor.ValueComposer>(compositions.size());
 			for(Composition c: compositions) {
 				composers.add(c.extractor.newComposer());
 			}
@@ -155,9 +204,9 @@ public class CompositeExtractorSet implements BinaryExtractorSet, Serializable {
 	private static class ExtractionContext {
 		
 		final ResultVectorReceiver resultVector;
-		final List<ValueComposer<?>> composers;
+		final List<ValueComposer> composers;
 		
-		private ExtractionContext(ResultVectorReceiver resultVector, List<ValueComposer<?>> composers) {
+		private ExtractionContext(ResultVectorReceiver resultVector, List<ValueComposer> composers) {
 			this.resultVector = resultVector;
 			this.composers = composers;
 		}

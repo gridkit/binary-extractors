@@ -1,12 +1,15 @@
 package org.gridkit.data.extractors.common;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 
 /**
  * "Do nothing" extractor, it will just let input byte buffer pass through. 
  * @author Alexey Ragozin (alexey.ragozin@gmail.com)
  */
-public final class VerbatimExtractor implements BinaryExtractor<ByteBuffer>, PushDownBinaryExtractor {
+public final class VerbatimExtractor implements BinaryExtractor<ByteBuffer>, Serializable {
+
+	private static final long serialVersionUID = 20130205L;
 
 	@Override
 	public boolean canPushDown(BinaryExtractor<?> nested) {
@@ -28,6 +31,22 @@ public final class VerbatimExtractor implements BinaryExtractor<ByteBuffer>, Pus
 		return set instanceof VerbatimExtractorSet && ((VerbatimExtractorSet)set).getInstance() == this;
 	}
 	
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		return true;
+	}
+
 	private static class VerbatimExtractorSet extends AbstractSingleExtractorSet {
 
 		private VerbatimExtractorSet(BinaryExtractor<?> instance) {
@@ -37,6 +56,11 @@ public final class VerbatimExtractor implements BinaryExtractor<ByteBuffer>, Pus
 		@Override
 		protected Object extract(ByteBuffer buffer) {
 			return buffer.slice();
+		}
+
+		@Override
+		public void dump(StringBuilder builder) {
+			builder.append("<verbatim/>\n");
 		}
 	}
 }

@@ -29,6 +29,10 @@ class Int2Int {
 		return map == null || index >= map.length ? -1 : map[index];
 	}
 	
+	public int size() {
+		return map == null ? 0 : map.length;
+	}
+	
 	public ResultVectorReceiver newMapper(final ResultVectorReceiver receiver) {
 		return new ResultVectorReceiver() {
 			@Override

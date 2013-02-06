@@ -16,6 +16,8 @@ public interface BinaryExtractorSet {
 	
 	public void compile();
 	
+	public void dump(StringBuilder builder);
+	
 	public void extractAll(ByteBuffer buffer, ResultVectorReceiver resultReceiver);
 
 }
