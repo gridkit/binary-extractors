@@ -236,6 +236,7 @@ public class ProtoBufExtractorSet implements BinaryExtractorSet {
 				for(Entry child: childEntries.values()) {
 					builder.append("<message fid=\"" + child.pbIndex + "\">\n");
 					child.dump(builder);
+					builder.append("</message>\n");
 				}				
 				builder.append("</fields>\n");
 			}
