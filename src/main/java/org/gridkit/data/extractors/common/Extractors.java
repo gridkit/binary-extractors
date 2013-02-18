@@ -48,18 +48,18 @@ public class Extractors {
 		return result;
 	}	
 	
-	public static String dump(BinaryExtractorSet set, int ident) {
+	public static String dump(BinaryExtractorSet set, int indent) {
 		StringBuilder sb = new StringBuilder();
 		set.dump(sb);
-		if (ident == 0) {
+		if (indent == 0) {
 			return sb.toString();
 		}
 		else {
-			return ident(sb.toString(), ident);
+			return indent(sb.toString(), indent);
 		}
 	}
 
-	private static String ident(String string, int ident) {
+	private static String indent(String string, int indent) {
 		StringBuilder sb = new StringBuilder();
 		
 		Pattern regex = Pattern.compile("(\n)|(<[^/>]+>)|(<[/][^/>]+>)|(<[^/>]+[/]>)");
@@ -73,7 +73,7 @@ public class Extractors {
 				}				
 				if ("\n".equals(m.group())) {
 					sb.append("\n");
-					for(int i = 0; i < ci * ident; ++i) {
+					for(int i = 0; i < ci * indent; ++i) {
 						sb.append(' ');
 					}
 				}
@@ -82,8 +82,8 @@ public class Extractors {
 				}
 				else if (m.group().startsWith("</")) {
 					--ci;
-					// undo identation before closing tag
-					for(int i = 0; i < ident; ++i) {
+					// undo indentation before closing tag
+					for(int i = 0; i < indent; ++i) {
 						if (sb.charAt(sb.length() - 1) == ' ') {
 							sb.setLength(sb.length() - 1);
 						}
