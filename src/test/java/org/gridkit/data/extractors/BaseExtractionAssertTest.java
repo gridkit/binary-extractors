@@ -12,10 +12,10 @@ import org.gridkit.data.extractors.common.BinaryExtractor;
 import org.gridkit.data.extractors.common.Blob;
 import org.gridkit.data.extractors.common.CompositeExtractorSet;
 import org.gridkit.data.extractors.common.Extractors;
-import org.gridkit.data.extractors.common.ResultVectorReceiver;
+import org.gridkit.data.extractors.common.VectorResultReceiver;
 import org.junit.Assert;
 
-abstract class BaseExtractionAssertTest implements ResultVectorReceiver {
+abstract class BaseExtractionAssertTest implements VectorResultReceiver {
 
 	private Map<String, Integer> extractorMap = new HashMap<String, Integer>();
 	private Map<Integer, Object> resultMap = new HashMap<Integer, Object>();

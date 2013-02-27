@@ -74,8 +74,8 @@ public class ListCollector<V> extends AbstractCompositeExtractor<List<V>> {
 		}
 
 		@Override
-		public void compose(ResultVectorReceiver output, int outputIndex) {
-			output.push(outputIndex, list);			
+		public void compose(ScalarResultReceiver output) {
+			output.push(list);			
 		}
 	}
 }

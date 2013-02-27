@@ -8,7 +8,7 @@ public interface CompositeExtractor<V> extends BinaryExtractor<V> {
 	
 	public ValueComposer newComposer();
 	
-	interface ValueComposer extends ResultVectorReceiver {		
-		public void compose(ResultVectorReceiver output, int outputIndex);		
+	interface ValueComposer extends VectorResultReceiver {		
+		public void compose(ScalarResultReceiver receiver);		
 	}	
 }

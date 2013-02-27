@@ -12,7 +12,7 @@ import java.util.TreeMap;
 import org.gridkit.data.extractors.common.BinaryExtractor;
 import org.gridkit.data.extractors.common.BinaryExtractorSet;
 import org.gridkit.data.extractors.common.CompositeExtractorSet;
-import org.gridkit.data.extractors.common.ResultVectorReceiver;
+import org.gridkit.data.extractors.common.VectorResultReceiver;
 import org.gridkit.data.extractors.protobuf.ProtoBufExtractor.Encoding;
 
 import com.google.protobuf.CodedInputStream;
@@ -39,7 +39,7 @@ public class ProtoBufExtractorSet implements BinaryExtractorSet {
 	}
 
 	@Override
-	public void extractAll(ByteBuffer buffer, ResultVectorReceiver resultReceiver) {
+	public void extractAll(ByteBuffer buffer, VectorResultReceiver resultReceiver) {
 		try {
 			CodedInputStream cis = PBHelper.inputStream(buffer);
 			root.extractAll(buffer, cis, resultReceiver);
@@ -165,7 +165,7 @@ public class ProtoBufExtractorSet implements BinaryExtractorSet {
 			}
 		}
 		
-		public void extractAll(ByteBuffer rootBuffer, CodedInputStream cis, ResultVectorReceiver receiver) throws IOException {
+		public void extractAll(ByteBuffer rootBuffer, CodedInputStream cis, VectorResultReceiver receiver) throws IOException {
 			if (composite != null) {
 				ByteBuffer bb = mapBuffer(rootBuffer, cis);
 				composite.extractAll(bb, compositeMapping.newMapper(receiver));
@@ -242,7 +242,7 @@ public class ProtoBufExtractorSet implements BinaryExtractorSet {
 			}
 		}
 
-		private void processPrimitives(int pbId, int type, ByteBuffer rootBuffer, int off, int len, ResultVectorReceiver receiver) throws IOException {
+		private void processPrimitives(int pbId, int type, ByteBuffer rootBuffer, int off, int len, VectorResultReceiver receiver) throws IOException {
 			ByteBuffer target = null;
 			for(PrimitiveSlot slot: getPrimitiveSlots(pbId)) {
 				if (target == null) {

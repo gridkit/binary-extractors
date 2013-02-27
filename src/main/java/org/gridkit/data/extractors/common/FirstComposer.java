@@ -20,10 +20,9 @@ class FirstComposer implements CompositeExtractor.ValueComposer {
 	}
 
 	@Override
-	public void compose(ResultVectorReceiver output, int outputIndex) {
+	public void compose(ScalarResultReceiver output) {
 		if (hasResult) {
-			output.push(outputIndex, result);
+			output.push(result);
 		}
-		
 	}
 }

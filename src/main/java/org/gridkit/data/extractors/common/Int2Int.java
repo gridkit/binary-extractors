@@ -2,7 +2,7 @@ package org.gridkit.data.extractors.common;
 
 import java.util.Arrays;
 
-import org.gridkit.data.extractors.common.ResultVectorReceiver;
+import org.gridkit.data.extractors.common.VectorResultReceiver;
 
 /**
  * Simple array backed class to map low scale integers.
@@ -35,8 +35,8 @@ class Int2Int {
 		return map == null ? 0 : map.length;
 	}
 	
-	public ResultVectorReceiver newMapper(final ResultVectorReceiver receiver) {
-		return new ResultVectorReceiver() {
+	public VectorResultReceiver newMapper(final VectorResultReceiver receiver) {
+		return new VectorResultReceiver() {
 			@Override
 			public void push(int id, Object part) {
 				int nid = get(id);

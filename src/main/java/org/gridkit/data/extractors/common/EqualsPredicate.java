@@ -84,19 +84,19 @@ public class EqualsPredicate extends AbstractCompositeExtractor<Boolean> {
 		}
 
 		@Override
-		public void compose(ResultVectorReceiver output, int outputIndex) {
+		public void compose(ScalarResultReceiver output) {
 			if (!leftDefined || !rightDefined) {
 				return;
 			}
 			else {
 				if (left == right) {
-					output.push(outputIndex, Boolean.TRUE);
+					output.push(Boolean.TRUE);
 				}
 				else if (left == null || right == null) {
-					output.push(outputIndex, Boolean.FALSE);
+					output.push(Boolean.FALSE);
 				}
 				else {
-					output.push(outputIndex, left.equals(right));
+					output.push(left.equals(right));
 				}
 			}
 		}

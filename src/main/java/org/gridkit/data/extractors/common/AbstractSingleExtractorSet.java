@@ -36,7 +36,7 @@ public abstract class AbstractSingleExtractorSet implements BinaryExtractorSet {
 	}
 
 	@Override
-	public void extractAll(ByteBuffer buffer, ResultVectorReceiver resultReceiver) {
+	public void extractAll(ByteBuffer buffer, VectorResultReceiver resultReceiver) {
 		resultReceiver.push(0, extract(buffer));		
 	}
 	

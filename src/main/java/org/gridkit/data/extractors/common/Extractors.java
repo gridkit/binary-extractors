@@ -12,7 +12,7 @@ public class Extractors {
 		final int id = set.addExtractor(extractor);
 		set.compile();
 		final Object[] result = new Object[1];
-		set.extractAll(binary, new ResultVectorReceiver() {
+		set.extractAll(binary, new VectorResultReceiver() {
 			@Override
 			public void push(int pid, Object part) {
 				if (id == pid) {
@@ -35,7 +35,7 @@ public class Extractors {
 		}
 		
 		final Object[] result = new Object[idmap.length];
-		set.extractAll(binary, new ResultVectorReceiver() {
+		set.extractAll(binary, new VectorResultReceiver() {
 			@Override
 			public void push(int pid, Object part) {
 				for(int i = 0; i != idmap.length; ++i) {

@@ -18,10 +18,9 @@ class AsIsComposer implements CompositeExtractor.ValueComposer {
 	}
 
 	@Override
-	public void compose(ResultVectorReceiver output, int outputIndex) {
+	public void compose(ScalarResultReceiver receiver) {
 		for(Object v: result) {
-			output.push(outputIndex, v);
+			receiver.push(v);
 		}
-		
 	}
 }

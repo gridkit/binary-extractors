@@ -1,14 +1,14 @@
 package org.gridkit.data.extractors.common;
 
-public interface ResultVectorReceiver {
+public interface VectorResultReceiver {
 
 	public void push(int id, Object part);
 	
-	public static class ResultVector implements ResultVectorReceiver {
+	public static class VectorResult implements VectorResultReceiver {
 		
 		private final Object[] vector;
 		
-		public ResultVector(int size) {
+		public VectorResult(int size) {
 			this.vector = new Object[size];
 		}
 

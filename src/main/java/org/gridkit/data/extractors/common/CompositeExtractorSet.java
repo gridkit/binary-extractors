@@ -173,7 +173,7 @@ public class CompositeExtractorSet implements BinaryExtractorSet, Serializable {
 	}
 
 	@Override
-	public void extractAll(ByteBuffer buffer, ResultVectorReceiver resultReceiver) {
+	public void extractAll(ByteBuffer buffer, VectorResultReceiver resultReceiver) {
 		if (!compiled) {
 			throw new IllegalStateException("Extractor set is not compiled");
 		}
@@ -188,7 +188,7 @@ public class CompositeExtractorSet implements BinaryExtractorSet, Serializable {
 		}		
 	}
 	
-	private ExtractionContext newContext(ResultVectorReceiver resultVector) {
+	private ExtractionContext newContext(VectorResultReceiver resultVector) {
 		if (compositions.isEmpty()) {
 			return new ExtractionContext(resultVector, Collections.<ValueComposer>emptyList());
 		}
@@ -203,10 +203,10 @@ public class CompositeExtractorSet implements BinaryExtractorSet, Serializable {
 	
 	private static class ExtractionContext {
 		
-		final ResultVectorReceiver resultVector;
+		final VectorResultReceiver resultVector;
 		final List<ValueComposer> composers;
 		
-		private ExtractionContext(ResultVectorReceiver resultVector, List<ValueComposer> composers) {
+		private ExtractionContext(VectorResultReceiver resultVector, List<ValueComposer> composers) {
 			this.resultVector = resultVector;
 			this.composers = composers;
 		}
@@ -221,7 +221,7 @@ public class CompositeExtractorSet implements BinaryExtractorSet, Serializable {
 
 		
 		public void exec(ByteBuffer buffer, final ExtractionContext context) {
-			extractorSet.extractAll(buffer, new ResultVectorReceiver() {
+			extractorSet.extractAll(buffer, new VectorResultReceiver() {
 				@Override
 				public void push(int id, Object part) {
 					outLinks[id].push(context, part);
@@ -243,23 +243,33 @@ public class CompositeExtractorSet implements BinaryExtractorSet, Serializable {
 		}
 
 		public void exec(final ExtractionContext context) {
-			context.composers.get(id).compose(new ResultVectorReceiver() {
-				@Override
-				public void push(int id, Object part) {
-					if (id == 0) {
-						outLink.push(context, part);
-					}
-					else {
-						throw new IllegalArgumentException("No such parameter: " + id);
-					}
-				}
-				
-			}, 0);
+			context.composers.get(id).compose(new LinkRef(outLink, context));
 		}
 	}
 	
 	private static interface ValueLink {
 		public void push(ExtractionContext context, Object value);
+	}
+	
+	private static class LinkRef implements ScalarResultReceiver {
+		
+		private final ValueLink link;
+		private final ExtractionContext context;
+
+		public LinkRef(ValueLink link, ExtractionContext context) {
+			this.link = link;
+			this.context = context;
+		}
+
+		@Override
+		public void push(Object part) {
+			link.push(context, part);
+		}
+
+		@Override
+		public String toString() {
+			return link.toString();
+		}
 	}
 	
 	private static class ForkLink implements ValueLink {

@@ -32,9 +32,8 @@ public class ConstExtractor<V> extends AbstractCompositeExtractor<V> {
 			}
 
 			@Override
-			public void compose(ResultVectorReceiver output, int outputIndex) {
-				output.push(outputIndex, value);
-				
+			public void compose(ScalarResultReceiver output) {
+				output.push(value);
 			}
 		};
 	}

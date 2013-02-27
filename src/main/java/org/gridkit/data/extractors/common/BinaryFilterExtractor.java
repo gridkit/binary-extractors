@@ -96,9 +96,9 @@ public class BinaryFilterExtractor<V> extends AbstractCompositeExtractor<V> {
 		}
 
 		@Override
-		public void compose(ResultVectorReceiver output, int outputIndex) {
+		public void compose(ScalarResultReceiver output) {
 			if (exists && passed) {
-				output.push(outputIndex, value);
+				output.push(value);
 			}			
 		}
 	}
