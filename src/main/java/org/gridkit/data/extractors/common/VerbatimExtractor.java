@@ -11,6 +11,8 @@ public final class VerbatimExtractor implements BinaryExtractor<ByteBuffer>, Ser
 
 	private static final long serialVersionUID = 20130205L;
 
+	public static final VerbatimExtractor INSTANCE = new VerbatimExtractor();
+	
 	@Override
 	public boolean canPushDown(BinaryExtractor<?> nested) {
 		return true;
@@ -45,6 +47,11 @@ public final class VerbatimExtractor implements BinaryExtractor<ByteBuffer>, Ser
 		if (getClass() != obj.getClass())
 			return false;
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		return "VERBATIM";
 	}
 
 	private static class VerbatimExtractorSet extends AbstractSingleExtractorSet {

@@ -27,7 +27,13 @@ public class ChainedBinaryExtractor<V> extends AbstractCompositeExtractor<V> {
 	@SuppressWarnings("unchecked")
 	public <VV> ChainedBinaryExtractor<VV> chain(BinaryExtractor<VV> tail) {
 		if (inner.canPushDown(tail)) {
-			return new ChainedBinaryExtractor<VV>(outter, inner.pushDown(tail));
+			BinaryExtractor<VV> ninner = inner.pushDown(tail);
+			if (outter.canPushDown(ninner)) {
+				return chain(VerbatimExtractor.INSTANCE, outter.pushDown(ninner));
+			}
+			else {
+				return new ChainedBinaryExtractor<VV>(outter, ninner);
+			}
 		}
 		else {
 			return chain((ChainedBinaryExtractor<ByteBuffer>)this, tail);
@@ -41,9 +47,14 @@ public class ChainedBinaryExtractor<V> extends AbstractCompositeExtractor<V> {
 
 	@Override
 	public <VV> BinaryExtractor<VV> pushDown(BinaryExtractor<VV> nested) {
-		return new ChainedBinaryExtractor<VV>(outter, inner.pushDown(nested));
+		BinaryExtractor<VV> ninner = inner.pushDown(nested);
+		if (outter.canPushDown(ninner)) {
+			return outter.pushDown(ninner);
+		}
+		else {
+			return new ChainedBinaryExtractor<VV>(outter, ninner);
+		}
 	}
-
 
 	@Override
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -100,7 +111,7 @@ public class ChainedBinaryExtractor<V> extends AbstractCompositeExtractor<V> {
 
 	@Override
 	public String toString() {
-		return inner + "/" + outter;
+		return outter + "/" + inner;
 	}
 
 	private static class ChainComposer extends AsIsComposer {

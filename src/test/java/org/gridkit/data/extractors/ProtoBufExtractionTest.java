@@ -6,8 +6,10 @@ import org.gridkit.data.extractors.common.BinaryExtractor;
 import org.gridkit.data.extractors.common.BinaryFilterExtractor;
 import org.gridkit.data.extractors.common.Blob;
 import org.gridkit.data.extractors.common.ChainedBinaryExtractor;
+import org.gridkit.data.extractors.common.ComparisonPredicate;
 import org.gridkit.data.extractors.common.ConstExtractor;
 import org.gridkit.data.extractors.common.EqualsPredicate;
+import org.gridkit.data.extractors.common.Extractors;
 import org.gridkit.data.extractors.common.ListCollector;
 import org.gridkit.data.extractors.protobuf.ProtoBufExtractor;
 import org.junit.Test;
@@ -94,12 +96,11 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		ProtoBufExtractor<Integer> ie = ProtoBufExtractor.int32(1,1,3,1);
 		addExtractor("l/l/v/int", ie);
 
-		ChainedBinaryExtractor.chain()
+		BinaryExtractor<String> se = ChainedBinaryExtractor.chain()
 							  .chain(ProtoBufExtractor.path(2))
 							  .chain(ProtoBufExtractor.path(2, 3))
 		                      .chain(ProtoBufExtractor.string(5));
 		
-		ProtoBufExtractor<String> se = ProtoBufExtractor.string(2,2,3,5);
 		addExtractor("r/r/v/string", se);
 		extract(getBytes("protobuf/Tree-1.bin"));
 		assertValue("l/l/v/int", 1000);
@@ -148,12 +149,32 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		BinaryFilterExtractor<String> propXXFilter = new BinaryFilterExtractor<String>(keyXXPred, valueField);
 		
 		
-		addExtractor("get(A)", ChainedBinaryExtractor.chain(ProtoBufExtractor.newBinaryExtractor(1), propAFilter));
-		addExtractor("get(B)", ChainedBinaryExtractor.chain(ProtoBufExtractor.newBinaryExtractor(1), propBFilter));
+		addExtractor("get(A)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), propAFilter));
+		addExtractor("get(B)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), propBFilter));
 		addExtractor("getAll(XX)", ListCollector.wrap(ChainedBinaryExtractor.chain(ProtoBufExtractor.newBinaryExtractor(1), propXXFilter)));
 		extract(getBytes("protobuf/TextProperties-2.bin"));
 		assertValue("get(A)", "aaa");
 		assertValue("get(B)", "bbb");
 		assertValue("getAll(XX)", Arrays.asList("v1", "v2", "v3", "v4", "v5"));
+	}
+
+	@Test
+	public void extract_prop_range() {
+		ProtoBufExtractor<String> keyField = ProtoBufExtractor.string(1);
+		ProtoBufExtractor<String> valueField = ProtoBufExtractor.string(2);
+		
+		// This will select key below "C" lexicographically 
+		BinaryExtractor<Boolean> keyBelowCPred = new ComparisonPredicate(ComparisonPredicate.Op.LT, keyField, ConstExtractor.newConst("C"));
+				
+		addExtractor("getAll([...,C))", ListCollector.wrap(
+				ChainedBinaryExtractor.chain()
+					.chain(ProtoBufExtractor.newBinaryExtractor(1))
+					.chain(Extractors.filter(keyBelowCPred))
+					.chain(valueField)));
+		
+		dump();
+		
+		extract(getBytes("protobuf/TextProperties-2.bin"));
+		assertValue("getAll([...,C))", Arrays.asList("aaa", "bbb"));
 	}
 }

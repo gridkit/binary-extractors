@@ -48,6 +48,10 @@ public class Extractors {
 		return result;
 	}	
 	
+	public static BinaryExtractor<ByteBuffer> filter(BinaryExtractor<Boolean> predicate) {
+		return new BinaryFilterExtractor<ByteBuffer>(predicate, VerbatimExtractor.INSTANCE); 
+	}
+	
 	public static String dump(BinaryExtractorSet set, int indent) {
 		StringBuilder sb = new StringBuilder();
 		set.dump(sb);

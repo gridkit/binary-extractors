@@ -378,8 +378,16 @@ public class ProtoBufExtractor<V> implements BinaryExtractor<V>, Serializable {
 	}
 	
 	@Override
-	public boolean canPushDown(BinaryExtractor<?> nested) {		
-		return encoding == Encoding.BINARY;
+	public boolean canPushDown(BinaryExtractor<?> nested) {
+		if (encoding == Encoding.BINARY) {
+			return true;
+		}
+		else if (encoding == null) {
+			return this.nested.canPushDown(nested);
+		}
+		else {
+			return false;
+		}
 	}
 
 	@Override
@@ -393,6 +401,9 @@ public class ProtoBufExtractor<V> implements BinaryExtractor<V>, Serializable {
 			else {
 				return new ProtoBufExtractor<VV>(path, nested);
 			}
+		}
+		else if (encoding == null) {
+			return new ProtoBufExtractor<VV>(path, this.nested.pushDown(nested));
 		}
 		else {
 			throw new IllegalArgumentException("Cannot push down");
