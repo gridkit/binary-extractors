@@ -172,8 +172,6 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 					.chain(Extractors.filter(keyBelowCPred))
 					.chain(valueField)));
 		
-		dump();
-		
 		extract(getBytes("protobuf/TextProperties-2.bin"));
 		assertValue("getAll([...,C))", Arrays.asList("aaa", "bbb"));
 	}
