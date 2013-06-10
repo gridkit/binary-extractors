@@ -1,7 +1,9 @@
 package org.gridkit.data.extractors;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import org.gridkit.data.extractors.common.AbstractValueTransformer;
 import org.gridkit.data.extractors.common.BinaryExtractor;
 import org.gridkit.data.extractors.common.BinaryFilterExtractor;
 import org.gridkit.data.extractors.common.Blob;
@@ -174,5 +176,49 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		
 		extract(getBytes("protobuf/TextProperties-2.bin"));
 		assertValue("getAll([...,C))", Arrays.asList("aaa", "bbb"));
+	}
+
+	@Test
+	public void extract_using_custom_parser() {
+		ProtoBufExtractor<String> keyField = ProtoBufExtractor.string(1);
+		BinaryExtractor<Long> valueField = ChainedBinaryExtractor.chain().chain(ProtoBufExtractor.path(2)).chain(new BlobLength());
+		
+		BinaryExtractor<Boolean> keyAPred = new EqualsPredicate(keyField, ConstExtractor.newConst("A"));
+		BinaryExtractor<Boolean> keyBPred = new EqualsPredicate(keyField, ConstExtractor.newConst("B"));
+		BinaryExtractor<Boolean> keyXXPred = new EqualsPredicate(keyField, ConstExtractor.newConst("XX"));
+		
+		BinaryFilterExtractor<Long> propAFilter = new BinaryFilterExtractor<Long>(keyAPred, valueField);
+		BinaryFilterExtractor<Long> propBFilter = new BinaryFilterExtractor<Long>(keyBPred, valueField);
+		BinaryFilterExtractor<Long> propXXFilter = new BinaryFilterExtractor<Long>(keyXXPred, valueField);
+		
+		addExtractor("get(A)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), propAFilter));
+		addExtractor("get(B)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), propBFilter));
+		addExtractor("getAll(XX)", ListCollector.wrap(ChainedBinaryExtractor.chain(ProtoBufExtractor.newBinaryExtractor(1), propXXFilter)));
+		extract(getBytes("protobuf/TextProperties-2.bin"));
+		assertValue("get(A)", 3l);
+		assertValue("get(B)", 3l);
+		assertValue("getAll(XX)", Arrays.asList(2l, 2l, 2l, 2l, 2l));
+	}
+	
+	@SuppressWarnings("serial")
+	public static class BlobLength extends AbstractValueTransformer<ByteBuffer, Long> {
+
+		public BlobLength() {
+			super();
+		}
+
+		public BlobLength(BinaryExtractor<ByteBuffer> sourceExtractor) {
+			super(sourceExtractor);
+		}
+
+		@Override
+		protected Long transform(ByteBuffer input) {
+			return (long)input.remaining();
+		}
+
+		@Override
+		public String toString() {
+			return super.toString() + "BlobLenght";
+		}
 	}
 }

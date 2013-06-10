@@ -225,27 +225,28 @@ public class ProtoBufExtractor<V> implements BinaryExtractor<V>, Serializable {
 		return nested;
 	}
 
-	protected Object decode(int wireType, ByteBuffer buffer) throws IOException {
-		switch(encoding) {
-		case SINGNED_INT32:
-			return decodeSignedInt(wireType, buffer);
-		case UNSIGNED_INT32:
-			return decodeUnsignedInt(wireType, buffer);
-		case SINGNED_INT64:
-			return decodeSignedLong(wireType, buffer);
-		case UNSIGNED_INT64:
-			return decodeUnsignedLong(wireType, buffer);
-		case FLOATING_POINT:
-			return decodeFloat(wireType, buffer);
-		case UTF8:
-			return decodeUTF8(wireType, buffer);
-		case BLOB:
-			return decodeBlob(wireType, buffer);
-		default:
-			throw new IllegalArgumentException("Unknown encoding");
-		}
-	}
-	
+//	
+//	protected Object decode(int wireType, ByteBuffer buffer) throws IOException {
+//		switch(encoding) {
+//		case SINGNED_INT32:
+//			return decodeSignedInt(wireType, buffer);
+//		case UNSIGNED_INT32:
+//			return decodeUnsignedInt(wireType, buffer);
+//		case SINGNED_INT64:
+//			return decodeSignedLong(wireType, buffer);
+//		case UNSIGNED_INT64:
+//			return decodeUnsignedLong(wireType, buffer);
+//		case FLOATING_POINT:
+//			return decodeFloat(wireType, buffer);
+//		case UTF8:
+//			return decodeUTF8(wireType, buffer);
+//		case BLOB:
+//			return decodeBlob(wireType, buffer);
+//		default:
+//			throw new IllegalArgumentException("Unknown encoding");
+//		}
+//	}
+//	
 	private static int decodeSignedInt(int wireType, ByteBuffer buffer) throws IOException {
 		int wireFormat = wireType & 0x7;
 		switch(wireFormat) {
