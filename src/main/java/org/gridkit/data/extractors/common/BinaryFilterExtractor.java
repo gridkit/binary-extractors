@@ -7,8 +7,8 @@ public class BinaryFilterExtractor<V> extends AbstractCompositeExtractor<V> {
 	
 	private static final long serialVersionUID = 20130205L;
 	
-	private final BinaryExtractor<Boolean> predicate;
-	private final BinaryExtractor<V> processor;
+	protected final BinaryExtractor<Boolean> predicate;
+	protected final BinaryExtractor<V> processor;
 
 	public BinaryFilterExtractor(BinaryExtractor<Boolean> predicate, BinaryExtractor<V> processor) {
 		this.predicate = predicate;
@@ -18,9 +18,13 @@ public class BinaryFilterExtractor<V> extends AbstractCompositeExtractor<V> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<BinaryExtractor<?>> getSubExtractors() {
-		return Arrays.asList(predicate, processor);
+		return Arrays.asList(predicate, wrapProcessor(processor));
 	}
 
+	protected BinaryExtractor<?> wrapProcessor(BinaryExtractor<?> processor) {
+		return processor;
+	}
+	
 	@Override
 	public boolean canPushDown(BinaryExtractor<?> nested) {		
 		return processor.canPushDown(nested);
@@ -70,12 +74,16 @@ public class BinaryFilterExtractor<V> extends AbstractCompositeExtractor<V> {
 		return true;
 	}
 
+	protected void processValue(ScalarResultReceiver output, Object value) {
+		output.push(value);
+	}
+	
 	@Override
 	public String toString() {
 		return "f(" + predicate + ")/" + processor;
 	}
 
-	private static class FilterComposer implements ValueComposer {
+	private class FilterComposer implements ValueComposer {
 		
 		private boolean passed;
 		private boolean exists;
@@ -98,7 +106,7 @@ public class BinaryFilterExtractor<V> extends AbstractCompositeExtractor<V> {
 		@Override
 		public void compose(ScalarResultReceiver output) {
 			if (exists && passed) {
-				output.push(value);
+				processValue(output, value);
 			}			
 		}
 	}
