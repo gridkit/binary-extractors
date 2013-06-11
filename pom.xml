@@ -35,9 +35,9 @@
     </properties>
 
     <scm>
-        <connection>scm:svn:http://gridkit.googlecode.com/svn/coherence-tools/branches/binary-extractors--lazy-parsing</connection>
-        <developerConnection>scm:svn:https://gridkit.googlecode.com/svn/coherence-tools/branches/binary-extractors--lazy-parsing</developerConnection>
-        <url>http://gridkit.googlecode.com/svn/coherence-tools/branches/binary-extractors--lazy-parsing</url>
+        <connection>scm:svn:http://gridkit.googlecode.com/svn/coherence-tools/trunk/binary-extractors</connection>
+        <developerConnection>scm:svn:https://gridkit.googlecode.com/svn/coherence-tools/trunk/binary-extractors</developerConnection>
+        <url>http://gridkit.googlecode.com/svn/coherence-tools/trunk/binary-extractors</url>
     </scm>
 
     <repositories>
