@@ -10,8 +10,6 @@ import org.gridkit.data.extractors.common.BinaryExtractor;
 import org.gridkit.data.extractors.common.BinaryExtractorSet;
 import org.gridkit.data.extractors.common.Blob;
 
-import com.google.protobuf.WireFormat;
-
 public class ProtoBufExtractor<V> implements BinaryExtractor<V>, Serializable {
 
 	private static final long serialVersionUID = 20130125L;
@@ -250,11 +248,11 @@ public class ProtoBufExtractor<V> implements BinaryExtractor<V>, Serializable {
 	private static int decodeSignedInt(int wireType, ByteBuffer buffer) throws IOException {
 		int wireFormat = wireType & 0x7;
 		switch(wireFormat) {
-		case WireFormat.WIRETYPE_VARINT:
+		case ProtoBufCodedStream.WIRETYPE_VARINT:
 			return PBHelper.inputStream(buffer).readSInt32();
-		case WireFormat.WIRETYPE_FIXED32:
+		case ProtoBufCodedStream.WIRETYPE_FIXED32:
 			return PBHelper.inputStream(buffer).readFixed32();
-		case WireFormat.WIRETYPE_FIXED64:
+		case ProtoBufCodedStream.WIRETYPE_FIXED64:
 			return (int) PBHelper.inputStream(buffer).readFixed64();
 		default:
 			throw new IOException("Wire format " + wireFormat + " cannot be interpreted as integer");
@@ -264,11 +262,11 @@ public class ProtoBufExtractor<V> implements BinaryExtractor<V>, Serializable {
 	private static int decodeUnsignedInt(int wireType, ByteBuffer buffer) throws IOException {
 		int wireFormat = wireType & 0x7;
 		switch(wireFormat) {
-		case WireFormat.WIRETYPE_VARINT:
+		case ProtoBufCodedStream.WIRETYPE_VARINT:
 			return PBHelper.inputStream(buffer).readInt32();
-		case WireFormat.WIRETYPE_FIXED32:
+		case ProtoBufCodedStream.WIRETYPE_FIXED32:
 			return PBHelper.inputStream(buffer).readFixed32();
-		case WireFormat.WIRETYPE_FIXED64:
+		case ProtoBufCodedStream.WIRETYPE_FIXED64:
 			return (int) PBHelper.inputStream(buffer).readFixed64();
 		default:
 			throw new IOException("Wire format " + wireFormat + " cannot be interpreted as integer");
@@ -278,11 +276,11 @@ public class ProtoBufExtractor<V> implements BinaryExtractor<V>, Serializable {
 	private static long decodeSignedLong(int wireType, ByteBuffer buffer) throws IOException {
 		int wireFormat = wireType & 0x7;
 		switch(wireFormat) {
-		case WireFormat.WIRETYPE_VARINT:
+		case ProtoBufCodedStream.WIRETYPE_VARINT:
 			return PBHelper.inputStream(buffer).readSInt64();
-		case WireFormat.WIRETYPE_FIXED32:
+		case ProtoBufCodedStream.WIRETYPE_FIXED32:
 			return PBHelper.inputStream(buffer).readFixed32();
-		case WireFormat.WIRETYPE_FIXED64:
+		case ProtoBufCodedStream.WIRETYPE_FIXED64:
 			return PBHelper.inputStream(buffer).readFixed64();
 		default:
 			throw new IOException("Wire format " + wireFormat + " cannot be interpreted as integer");
@@ -292,11 +290,11 @@ public class ProtoBufExtractor<V> implements BinaryExtractor<V>, Serializable {
 	private static long decodeUnsignedLong(int wireType, ByteBuffer buffer) throws IOException {
 		int wireFormat = wireType & 0x7;
 		switch(wireFormat) {
-		case WireFormat.WIRETYPE_VARINT:
+		case ProtoBufCodedStream.WIRETYPE_VARINT:
 			return PBHelper.inputStream(buffer).readInt64();
-		case WireFormat.WIRETYPE_FIXED32:
+		case ProtoBufCodedStream.WIRETYPE_FIXED32:
 			return PBHelper.inputStream(buffer).readFixed32();
-		case WireFormat.WIRETYPE_FIXED64:
+		case ProtoBufCodedStream.WIRETYPE_FIXED64:
 			return PBHelper.inputStream(buffer).readFixed64();
 		default:
 			throw new IOException("Wire format " + wireFormat + " cannot be interpreted as integer");
@@ -306,9 +304,9 @@ public class ProtoBufExtractor<V> implements BinaryExtractor<V>, Serializable {
 	private static Object decodeFloat(int wireType, ByteBuffer buffer) throws IOException {
 		int wireFormat = wireType & 0x7;
 		switch(wireFormat) {
-		case WireFormat.WIRETYPE_FIXED32:
+		case ProtoBufCodedStream.WIRETYPE_FIXED32:
 			return PBHelper.inputStream(buffer).readFloat();
-		case WireFormat.WIRETYPE_FIXED64:
+		case ProtoBufCodedStream.WIRETYPE_FIXED64:
 			return PBHelper.inputStream(buffer).readDouble();
 		default:
 			throw new IOException("Wire format " + wireFormat + " cannot be interpreted as floating point");
@@ -318,7 +316,7 @@ public class ProtoBufExtractor<V> implements BinaryExtractor<V>, Serializable {
 	private static String decodeUTF8(int wireType, ByteBuffer buffer) throws IOException {
 		int wireFormat = wireType & 0x7;
 		switch(wireFormat) {
-		case WireFormat.WIRETYPE_LENGTH_DELIMITED:
+		case ProtoBufCodedStream.WIRETYPE_LENGTH_DELIMITED:
 			return UTF8.decode(buffer).toString();
 		default:
 			throw new IOException("Wire format " + wireFormat + " cannot be interpreted as floating point");
@@ -328,7 +326,7 @@ public class ProtoBufExtractor<V> implements BinaryExtractor<V>, Serializable {
 	private static Object decodeBlob(int wireType, ByteBuffer buffer) throws IOException {
 		int wireFormat = wireType & 0x7;
 		switch(wireFormat) {
-		case WireFormat.WIRETYPE_LENGTH_DELIMITED:
+		case ProtoBufCodedStream.WIRETYPE_LENGTH_DELIMITED:
 			return new Blob(buffer);
 		default:
 			throw new IOException("Wire format " + wireFormat + " cannot be interpreted as binary");

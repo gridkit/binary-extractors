@@ -11,12 +11,10 @@ import java.util.TreeMap;
 
 import org.gridkit.data.extractors.common.BinaryExtractor;
 import org.gridkit.data.extractors.common.BinaryExtractorSet;
+import org.gridkit.data.extractors.common.BinaryReader;
 import org.gridkit.data.extractors.common.CompositeExtractorSet;
 import org.gridkit.data.extractors.common.VectorResultReceiver;
 import org.gridkit.data.extractors.protobuf.ProtoBufExtractor.Encoding;
-
-import com.google.protobuf.CodedInputStream;
-import com.google.protobuf.WireFormat;
 
 public class ProtoBufExtractorSet implements BinaryExtractorSet {
 
@@ -41,8 +39,8 @@ public class ProtoBufExtractorSet implements BinaryExtractorSet {
 	@Override
 	public void extractAll(ByteBuffer buffer, VectorResultReceiver resultReceiver) {
 		try {
-			CodedInputStream cis = PBHelper.inputStream(buffer);
-			root.extractAll(buffer, cis, resultReceiver);
+			ProtoBufCodedStream cis = PBHelper.inputStream(buffer);
+			root.extractAll(cis, resultReceiver);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -165,10 +163,10 @@ public class ProtoBufExtractorSet implements BinaryExtractorSet {
 			}
 		}
 		
-		public void extractAll(ByteBuffer rootBuffer, CodedInputStream cis, VectorResultReceiver receiver) throws IOException {
+		public void extractAll(ProtoBufCodedStream cis, VectorResultReceiver receiver) throws IOException {
 			if (composite != null) {
-				ByteBuffer bb = mapBuffer(rootBuffer, cis);
-				composite.extractAll(bb, compositeMapping.newMapper(receiver));
+				BinaryReader br = cis.limitedReader();
+				composite.extractAll(br.asBuffer(), compositeMapping.newMapper(receiver));
 			}
 			if (primitiveSlots.isEmpty() && childEntries.isEmpty()) {
 				// do not parse fields
@@ -177,31 +175,33 @@ public class ProtoBufExtractorSet implements BinaryExtractorSet {
 			}
 			while(!cis.isAtEnd()) {
 				int tag = cis.readTag();
-				int pbId = WireFormat.getTagFieldNumber(tag);
+				int pbId = ProtoBufCodedStream.getTagFieldNumber(tag);
 				int type = tag & 7;
 				switch(type) {
-				case WireFormat.WIRETYPE_VARINT:
-				case WireFormat.WIRETYPE_FIXED32:
-				case WireFormat.WIRETYPE_FIXED64:
+				case ProtoBufCodedStream.WIRETYPE_VARINT:
+				case ProtoBufCodedStream.WIRETYPE_FIXED32:
+				case ProtoBufCodedStream.WIRETYPE_FIXED64:
 				{
+					BinaryReader reader = cis.limitedReader();
 					int off = cis.getTotalBytesRead();
 					cis.skipField(tag);
 					int len = cis.getTotalBytesRead() - off;
-					processPrimitives(pbId, type, rootBuffer, off, len, receiver);
+					reader = reader.slice(0, len);
+					processPrimitives(pbId, type, reader, receiver);
 					if (childEntries.containsKey(pbId)) {
-						ByteBuffer slice = slice(rootBuffer, off, len);
-						childEntries.get(pbId).extractAll(slice, PBHelper.inputStream(slice), receiver);						
+						childEntries.get(pbId).extractAll(PBHelper.inputStream(reader.asBuffer()), receiver);						
 					}
 					break;
 				}
-				case WireFormat.WIRETYPE_LENGTH_DELIMITED:
-				{
+				case ProtoBufCodedStream.WIRETYPE_LENGTH_DELIMITED:
+				{					
 					int len = cis.readUInt32();
- 					int off = cis.getTotalBytesRead();
-					processPrimitives(pbId, type, rootBuffer, off, len, receiver);
+					BinaryReader reader = cis.limitedReader();
+ 					reader = reader.slice(0, len);
+					processPrimitives(pbId, type, reader, receiver);
 					if (childEntries.containsKey(pbId)) {
 						int limit = cis.pushLimit(len);
-						childEntries.get(pbId).extractAll(rootBuffer, cis, receiver);
+						childEntries.get(pbId).extractAll(cis, receiver);
 						cis.skipMessage();
 						cis.popLimit(limit);
 					}
@@ -242,30 +242,14 @@ public class ProtoBufExtractorSet implements BinaryExtractorSet {
 			}
 		}
 
-		private void processPrimitives(int pbId, int type, ByteBuffer rootBuffer, int off, int len, VectorResultReceiver receiver) throws IOException {
+		private void processPrimitives(int pbId, int type, BinaryReader reader, VectorResultReceiver receiver) throws IOException {
 			ByteBuffer target = null;
 			for(PrimitiveSlot slot: getPrimitiveSlots(pbId)) {
 				if (target == null) {
-					target = slice(rootBuffer, off, len);
+					target = reader.asBuffer();
 				}
 				receiver.push(slot.outputId, slot.encoding.decode(type, target));
 			}			
-		}
-
-		private ByteBuffer mapBuffer(ByteBuffer rootBuffer, CodedInputStream cis) {
-			int offs = cis.getTotalBytesRead();
-			int len = cis.getBytesUntilLimit();
-			ByteBuffer slice = rootBuffer.duplicate();
-			slice.position(offs);
-			slice.limit(offs + len);
-			return slice.slice();
-		}
-
-		private ByteBuffer slice(ByteBuffer rootBuffer, int offs, int len) {
-			ByteBuffer slice = rootBuffer.duplicate();
-			slice.position(offs);
-			slice.limit(offs + len);
-			return slice.slice();
 		}
 	}
 	
