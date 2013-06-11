@@ -49,7 +49,7 @@ public class Extractors {
 	}	
 	
 	public static BinaryExtractor<ByteBuffer> filter(BinaryExtractor<Boolean> predicate) {
-		return new BinaryFilterExtractor<ByteBuffer>(predicate, VerbatimExtractor.INSTANCE); 
+		return new FilterExtractor<ByteBuffer>(predicate, VerbatimExtractor.INSTANCE); 
 	}
 	
 	public static String dump(BinaryExtractorSet set, int indent) {

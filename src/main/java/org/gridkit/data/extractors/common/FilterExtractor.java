@@ -3,14 +3,22 @@ package org.gridkit.data.extractors.common;
 import java.util.Arrays;
 import java.util.List;
 
-public class BinaryFilterExtractor<V> extends AbstractCompositeExtractor<V> {
+public class FilterExtractor<V> extends AbstractCompositeExtractor<V> {
 	
 	private static final long serialVersionUID = 20130205L;
 	
 	protected final BinaryExtractor<Boolean> predicate;
 	protected final BinaryExtractor<V> processor;
 
-	public BinaryFilterExtractor(BinaryExtractor<Boolean> predicate, BinaryExtractor<V> processor) {
+	public static <T> FilterExtractor<T> filter(BinaryExtractor<Boolean> prediacte, BinaryExtractor<T> processor) {
+		return new FilterExtractor<T>(prediacte, processor);
+	}
+
+	public static <V> FilterExtractor<V> lazyFilter(BinaryExtractor<Boolean> prediacte, BinaryExtractor<V> processor) {
+		return new LazyFilterExtractor<V>(prediacte, processor);
+	}
+	
+	public FilterExtractor(BinaryExtractor<Boolean> predicate, BinaryExtractor<V> processor) {
 		this.predicate = predicate;
 		this.processor = processor;
 	}
@@ -32,7 +40,7 @@ public class BinaryFilterExtractor<V> extends AbstractCompositeExtractor<V> {
 
 	@Override
 	public <VV> BinaryExtractor<VV> pushDown(BinaryExtractor<VV> nested) {
-		return new BinaryFilterExtractor<VV>(predicate, processor.pushDown(nested));
+		return new FilterExtractor<VV>(predicate, processor.pushDown(nested));
 	}
 
 	@Override
@@ -60,7 +68,7 @@ public class BinaryFilterExtractor<V> extends AbstractCompositeExtractor<V> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		BinaryFilterExtractor other = (BinaryFilterExtractor) obj;
+		FilterExtractor other = (FilterExtractor) obj;
 		if (predicate == null) {
 			if (other.predicate != null)
 				return false;

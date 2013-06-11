@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import org.gridkit.data.extractors.common.AbstractValueTransformer;
 import org.gridkit.data.extractors.common.BinaryExtractor;
-import org.gridkit.data.extractors.common.BinaryFilterExtractor;
+import org.gridkit.data.extractors.common.FilterExtractor;
 import org.gridkit.data.extractors.common.Blob;
 import org.gridkit.data.extractors.common.ChainedBinaryExtractor;
 import org.gridkit.data.extractors.common.ComparisonPredicate;
@@ -126,8 +126,8 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		BinaryExtractor<Boolean> keyAPred = new EqualsPredicate(keyField, ConstExtractor.newConst("A"));
 		BinaryExtractor<Boolean> keyBPred = new EqualsPredicate(keyField, ConstExtractor.newConst("B"));
 		
-		BinaryFilterExtractor<String> keyAFilter = new BinaryFilterExtractor<String>(keyAPred, valueField);
-		BinaryFilterExtractor<String> keyBFilter = new BinaryFilterExtractor<String>(keyBPred, valueField);
+		FilterExtractor<String> keyAFilter = new FilterExtractor<String>(keyAPred, valueField);
+		FilterExtractor<String> keyBFilter = new FilterExtractor<String>(keyBPred, valueField);
 		
 		
 		addExtractor("get(A)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), keyAFilter));
@@ -135,6 +135,43 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		extract(getBytes("protobuf/TextProperties-1.bin"));
 		assertValue("get(A)", "aaa");
 		assertValue("get(B)", "bbb");
+	}
+
+	@Test(expected=NumberFormatException.class)
+	public void extract_property_by_name__fail_on_eager_parsing() {
+		ProtoBufExtractor<String> keyField = ProtoBufExtractor.string(1);
+		BinaryExtractor<Integer> valueField = new StringToInt(ProtoBufExtractor.string(2));
+		
+		BinaryExtractor<Boolean> keyAPred = new EqualsPredicate(keyField, ConstExtractor.newConst("A"));
+		BinaryExtractor<Boolean> keyBPred = new EqualsPredicate(keyField, ConstExtractor.newConst("B"));
+		
+		FilterExtractor<Integer> keyAFilter = FilterExtractor.filter(keyAPred, valueField);
+		FilterExtractor<Integer> keyBFilter = FilterExtractor.filter(keyBPred, valueField);
+		
+		
+		addExtractor("get(A)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), keyAFilter));
+		addExtractor("get(B)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), keyBFilter));
+		extract(getBytes("protobuf/TextProperties-3.bin"));
+		assertValue("get(A)", 128);
+		assertValue("get(B)", 256);
+	}
+
+	@Test
+	public void extract_property_by_name_using_lazy_parser() {
+		ProtoBufExtractor<String> keyField = ProtoBufExtractor.string(1);
+		BinaryExtractor<Integer> valueField = new StringToInt(ProtoBufExtractor.string(2));
+		
+		BinaryExtractor<Boolean> keyAPred = new EqualsPredicate(keyField, ConstExtractor.newConst("A"));
+		BinaryExtractor<Boolean> keyBPred = new EqualsPredicate(keyField, ConstExtractor.newConst("B"));
+		
+		FilterExtractor<Integer> keyAFilter = FilterExtractor.lazyFilter(keyAPred, valueField);
+		FilterExtractor<Integer> keyBFilter = FilterExtractor.lazyFilter(keyBPred, valueField);
+		
+		addExtractor("get(A)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), keyAFilter));
+		addExtractor("get(B)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), keyBFilter));
+		extract(getBytes("protobuf/TextProperties-3.bin"));
+		assertValue("get(A)", 128);
+		assertValue("get(B)", 256);
 	}
 
 	@Test
@@ -146,9 +183,9 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		BinaryExtractor<Boolean> keyBPred = new EqualsPredicate(keyField, ConstExtractor.newConst("B"));
 		BinaryExtractor<Boolean> keyXXPred = new EqualsPredicate(keyField, ConstExtractor.newConst("XX"));
 		
-		BinaryFilterExtractor<String> propAFilter = new BinaryFilterExtractor<String>(keyAPred, valueField);
-		BinaryFilterExtractor<String> propBFilter = new BinaryFilterExtractor<String>(keyBPred, valueField);
-		BinaryFilterExtractor<String> propXXFilter = new BinaryFilterExtractor<String>(keyXXPred, valueField);
+		FilterExtractor<String> propAFilter = new FilterExtractor<String>(keyAPred, valueField);
+		FilterExtractor<String> propBFilter = new FilterExtractor<String>(keyBPred, valueField);
+		FilterExtractor<String> propXXFilter = new FilterExtractor<String>(keyXXPred, valueField);
 		
 		
 		addExtractor("get(A)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), propAFilter));
@@ -187,9 +224,9 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		BinaryExtractor<Boolean> keyBPred = new EqualsPredicate(keyField, ConstExtractor.newConst("B"));
 		BinaryExtractor<Boolean> keyXXPred = new EqualsPredicate(keyField, ConstExtractor.newConst("XX"));
 		
-		BinaryFilterExtractor<Long> propAFilter = new BinaryFilterExtractor<Long>(keyAPred, valueField);
-		BinaryFilterExtractor<Long> propBFilter = new BinaryFilterExtractor<Long>(keyBPred, valueField);
-		BinaryFilterExtractor<Long> propXXFilter = new BinaryFilterExtractor<Long>(keyXXPred, valueField);
+		FilterExtractor<Long> propAFilter = new FilterExtractor<Long>(keyAPred, valueField);
+		FilterExtractor<Long> propBFilter = new FilterExtractor<Long>(keyBPred, valueField);
+		FilterExtractor<Long> propXXFilter = new FilterExtractor<Long>(keyXXPred, valueField);
 		
 		addExtractor("get(A)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), propAFilter));
 		addExtractor("get(B)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), propBFilter));
@@ -219,6 +256,28 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		@Override
 		public String toString() {
 			return super.toString() + "BlobLenght";
+		}
+	}
+
+	@SuppressWarnings("serial")
+	public static class StringToInt extends AbstractValueTransformer<String, Integer> {
+		
+		public StringToInt() {
+			super();
+		}
+		
+		public StringToInt(BinaryExtractor<String> sourceExtractor) {
+			super(sourceExtractor);
+		}
+		
+		@Override
+		protected Integer transform(String input) {
+			return Integer.parseInt(input);
+		}
+		
+		@Override
+		public String toString() {
+			return super.toString() + "StringToInt";
 		}
 	}
 }

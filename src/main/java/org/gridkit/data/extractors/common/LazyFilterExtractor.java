@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 /**
  * <p>
- * {@link LazyBinaryFilterExtractor} always create a dedicated {@link BinaryExtractorSet}
+ * {@link LazyFilterExtractor} always create a dedicated {@link BinaryExtractorSet}
  * for processor part of extractor.
  * </p>
  * <p>
@@ -13,11 +13,11 @@ import java.nio.ByteBuffer;
  *  
  * @author Alexey Ragozin (alexey.ragozin@gmail.com)
  */
-public class LazyBinaryFilterExtractor<V> extends BinaryFilterExtractor<V> {
+public class LazyFilterExtractor<V> extends FilterExtractor<V> {
 	
 	private static final long serialVersionUID = 20130611L;
 
-	public LazyBinaryFilterExtractor(BinaryExtractor<Boolean> predicate, BinaryExtractor<V> processor) {
+	public LazyFilterExtractor(BinaryExtractor<Boolean> predicate, BinaryExtractor<V> processor) {
 		super(predicate, processor);
 	}
 
@@ -36,7 +36,7 @@ public class LazyBinaryFilterExtractor<V> extends BinaryFilterExtractor<V> {
 	
 	@Override
 	public <VV> BinaryExtractor<VV> pushDown(BinaryExtractor<VV> nested) {
-		return new LazyBinaryFilterExtractor<VV>(predicate, processor.pushDown(nested));
+		return new LazyFilterExtractor<VV>(predicate, processor.pushDown(nested));
 	}
 	
 	@Override
