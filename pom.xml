@@ -28,7 +28,7 @@
     <name>${project.groupId}::${project.artifactId}</name>
     <description>Collection of classes to extract information from structured formats without deserialization</description>
     <packaging>jar</packaging>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
 
     <licenses>
         <license>
@@ -54,7 +54,8 @@
         <connection>scm:git:https://github.com/gridkit/binary-extractors.git</connection>
         <developerConnection>scm:git:https://github.com/gridkit/binary-extractors.git</developerConnection>
         <url>https://github.com/gridkit/binary-extractors</url>
-    </scm>
+      <tag>binary-extractors-0.1</tag>
+  </scm>
 
     <dependencies>
         <dependency>
