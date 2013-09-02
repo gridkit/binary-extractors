@@ -20,8 +20,8 @@
 
     <parent>
         <groupId>org.gridkit.coherence-tools</groupId>
-        <artifactId>coherence-tools-parent</artifactId>
-        <version>1.2</version>
+        <artifactId>coherence-tools-parent-pom</artifactId>
+        <version>2</version>
     </parent>
 
     <artifactId>binary-extractors</artifactId>
@@ -30,31 +30,31 @@
     <packaging>jar</packaging>
     <version>0.1-SNAPSHOT</version>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>alexey.ragozin</id>
+            <name>Alexey Ragozin</name>
+            <email>alexey.ragozin@gmail.com</email>
+        </developer>
+    </developers>
+
     <properties>
         <javaVersion>1.6</javaVersion>
     </properties>
 
     <scm>
-        <connection>scm:svn:http://gridkit.googlecode.com/svn/coherence-tools/trunk/binary-extractors</connection>
-        <developerConnection>scm:svn:https://gridkit.googlecode.com/svn/coherence-tools/trunk/binary-extractors</developerConnection>
-        <url>http://gridkit.googlecode.com/svn/coherence-tools/trunk/binary-extractors</url>
+        <connection>scm:git:https://github.com/gridkit/binary-extractors.git</connection>
+        <developerConnection>scm:git:https://github.com/gridkit/binary-extractors.git</developerConnection>
+        <url>https://github.com/gridkit/binary-extractors</url>
     </scm>
-
-    <repositories>
-        <!-- GridKit maven2 repository -->
-        <repository>
-            <id>gridkit-releases</id>
-            <name>gridkit-repo.googlecode.com</name>
-            <url>http://gridkit.googlecode.com/svn/repo/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -83,6 +83,42 @@
                     <encoding>UTF-8</encoding>
                 </configuration> 
             </plugin>                
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <remoteTagging>false</remoteTagging>
+                    <suppressCommitBeforeTag>true</suppressCommitBeforeTag>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadoc</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-source</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
