@@ -13,6 +13,7 @@ import org.gridkit.data.extractors.common.ConstExtractor;
 import org.gridkit.data.extractors.common.EqualsPredicate;
 import org.gridkit.data.extractors.common.Extractors;
 import org.gridkit.data.extractors.common.ListCollector;
+import org.gridkit.data.extractors.common.VerbatimExtractor;
 import org.gridkit.data.extractors.protobuf.ProtoBufExtractor;
 import org.junit.Test;
 
@@ -21,6 +22,15 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 	@Test
 	public void extract_unsigned_int_from_simple_object() {
 		ProtoBufExtractor<Integer> pbe = ProtoBufExtractor.int32(1);
+		addExtractor("intField", pbe);
+		extract(getBytes("protobuf/SimpleObject-1.bin"));
+		assertValue("intField", 128);
+	}
+
+	@Test
+	public void extract_unsigned_int_from_simple_object2() {
+		BinaryExtractor<?> pbe = ProtoBufExtractor.int32(1);
+		pbe = ChainedBinaryExtractor.chain(VerbatimExtractor.INSTANCE, pbe);
 		addExtractor("intField", pbe);
 		extract(getBytes("protobuf/SimpleObject-1.bin"));
 		assertValue("intField", 128);
@@ -79,6 +89,78 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		ProtoBufExtractor<Blob> pbe = ProtoBufExtractor.newBlobExtractor(8);
 		addExtractor("blobField", pbe);
 		extract(getBytes("protobuf/SimpleObject-1.bin"));
+		assertValue("blobField", blob("XYZ"));
+	}
+	@Test
+	public void extract_unsigned_int_from_complex_object() {
+		ProtoBufExtractor<Integer> pbe = ProtoBufExtractor.int32(2, 1);
+		addExtractor("intField", pbe);
+		extract(getBytes("protobuf/ComplexObject-1.bin"));
+		assertValue("intField", 128);
+	}
+	
+	@Test
+	public void extract_unsigned_int_from_complex_object2() {
+		BinaryExtractor<?> pbe = ProtoBufExtractor.int32(2, 1);
+		pbe = ChainedBinaryExtractor.chain(VerbatimExtractor.INSTANCE, pbe);
+		addExtractor("intField", pbe);
+		extract(getBytes("protobuf/ComplexObject-1.bin"));
+		assertValue("intField", 128);
+	}
+	
+	@Test
+	public void extract_signed_int_from_complex_object() {
+		ProtoBufExtractor<Integer> pbe = ProtoBufExtractor.sint32(2, 2);
+		addExtractor("sintField", pbe);
+		extract(getBytes("protobuf/ComplexObject-1.bin"));
+		assertValue("sintField", -100);
+	}
+	
+	@Test
+	public void extract_unsigned_long_from_complex_object() {
+		ProtoBufExtractor<Long> pbe = ProtoBufExtractor.int64(2, 3);
+		addExtractor("longField", pbe);
+		extract(getBytes("protobuf/ComplexObject-1.bin"));
+		assertValue("longField", 10000000000l);
+	}
+	
+	@Test
+	public void extract_signed_long_from_complex_object() {
+		ProtoBufExtractor<Long> pbe = ProtoBufExtractor.sint64(2, 4);
+		addExtractor("slongField", pbe);
+		extract(getBytes("protobuf/ComplexObject-1.bin"));
+		assertValue("slongField", -10000000000l);
+	}
+	
+	@Test
+	public void extract_string_from_complex_object() {
+		ProtoBufExtractor<String> pbe = ProtoBufExtractor.string(2, 5);
+		addExtractor("stringField", pbe);
+		extract(getBytes("protobuf/ComplexObject-1.bin"));
+		assertValue("stringField", "ABC");
+	}
+	
+	@Test
+	public void extract_double_from_complex_object() {
+		ProtoBufExtractor<Number> pbe = ProtoBufExtractor.fp(2, 6);
+		addExtractor("doubleField", pbe);
+		extract(getBytes("protobuf/ComplexObject-1.bin"));
+		assertValue("doubleField", 3.14d);
+	}
+	
+	@Test
+	public void extract_float_from_complex_object() {
+		ProtoBufExtractor<Number> pbe = ProtoBufExtractor.fp(2, 7);
+		addExtractor("floatField", pbe);
+		extract(getBytes("protobuf/ComplexObject-1.bin"));
+		assertValue("floatField", 3.14f);
+	}
+	
+	@Test
+	public void extract_blob_from_complex_object() {
+		ProtoBufExtractor<Blob> pbe = ProtoBufExtractor.newBlobExtractor(2, 8);
+		addExtractor("blobField", pbe);
+		extract(getBytes("protobuf/ComplexObject-1.bin"));
 		assertValue("blobField", blob("XYZ"));
 	}
 	
@@ -254,8 +336,8 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		}
 
 		@Override
-		public String toString() {
-			return super.toString() + "BlobLenght";
+		protected String getDescription() {
+			return "BlobLenght";
 		}
 	}
 
@@ -276,8 +358,8 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		}
 		
 		@Override
-		public String toString() {
-			return super.toString() + "StringToInt";
+		protected String getDescription() {
+			return "StringToInt";
 		}
 	}
 }

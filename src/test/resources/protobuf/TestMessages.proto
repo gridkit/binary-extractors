@@ -11,6 +11,12 @@ message SimpleObject {
     optional bytes blobField = 8;
 }
 
+message ComplexObject {
+    required string id = 1;
+    required SimpleObject data1 = 2;
+    optional SimpleObject data2 = 3;
+}
+
 message TextProperty {
     required string propName = 1;
     optional string propValue = 2;

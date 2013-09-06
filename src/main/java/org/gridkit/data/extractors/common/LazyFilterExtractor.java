@@ -101,6 +101,11 @@ public class LazyFilterExtractor<V> extends FilterExtractor<V> {
 			return new Lazy(set, id, buffer);
 		}
 		
+		@Override
+		protected String getDescription() {
+			return "LAZY";
+		}
+
 		public String toString() {
 			return "LAZY[" + extractor + "]";
 		}

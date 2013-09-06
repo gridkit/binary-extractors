@@ -14,7 +14,7 @@ public abstract class AbstractValueTransformer<InType, OutType> extends Abstract
 	
 	private static final long serialVersionUID = 20130609L;
 
-	/** Cloud be null */
+	/** Should not be null */
 	protected BinaryExtractor<InType> sourceExtractor;
 
 	public AbstractValueTransformer() {
@@ -64,8 +64,10 @@ public abstract class AbstractValueTransformer<InType, OutType> extends Abstract
 		return true;
 	}
 
+	protected abstract String getDescription();
+	
 	public String toString() {
-		return sourceExtractor == null ? "" : sourceExtractor + "/"; 
+		return sourceExtractor == null ? "" : sourceExtractor + "/" + getDescription(); 
 	}
 	
 	@Override

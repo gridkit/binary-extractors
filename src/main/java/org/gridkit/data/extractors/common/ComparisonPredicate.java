@@ -10,8 +10,15 @@ public class ComparisonPredicate extends AbstractCompositeExtractor<Boolean> imp
 	private static final long serialVersionUID = 20130227L;
 	
 	public enum Op {
-		EQ, GT, LT, GE, LE
+		EQ, NE, GT, LT, GE, LE
 	}
+	
+	public static Op EQ = Op.EQ;
+	public static Op NE = Op.NE;
+	public static Op GT = Op.GT;
+	public static Op LT = Op.LT;
+	public static Op GE = Op.GE;
+	public static Op LE = Op.LE;
 	
 	private Op predicateOp;
 	private BinaryExtractor<?> left;
@@ -87,11 +94,13 @@ public class ComparisonPredicate extends AbstractCompositeExtractor<Boolean> imp
 			protected void interpret(ScalarResultReceiver receiver, int n) {
 				switch(predicateOp) {
 				case EQ: receiver.push(n == 0); break;
+				case NE: receiver.push(n != 0); break;
 				case GT: receiver.push(n > 0); break;
 				case GE: receiver.push(n >= 0); break;
 				case LT: receiver.push(n < 0); break;
 				case LE: receiver.push(n <= 0); break;
 				default:
+					throw new RuntimeException("Unknown operation: " + predicateOp);
 				}
 			}
 		};

@@ -24,6 +24,7 @@
         <version>2</version>
     </parent>
 
+    <groupId>org.gridkit.binary-extractors</groupId>
     <artifactId>binary-extractors</artifactId>
     <name>${project.groupId}::${project.artifactId}</name>
     <description>Collection of classes to extract information from structured formats without deserialization</description>
