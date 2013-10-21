@@ -15,7 +15,7 @@ import org.gridkit.data.extractors.common.EqualsPredicate;
 import org.gridkit.data.extractors.common.Extractors;
 import org.gridkit.data.extractors.common.FilterExtractor;
 import org.gridkit.data.extractors.common.ListCollector;
-import org.gridkit.data.extractors.common.SimpleMapExtractor;
+import org.gridkit.data.extractors.common.MapExtractor;
 import org.gridkit.data.extractors.common.VerbatimExtractor;
 import org.gridkit.data.extractors.protobuf.ProtoBufExtractor;
 import org.junit.Test;
@@ -324,8 +324,8 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 
 	@Test
 	public void extract_from_composite_source() {
-		BinaryExtractor<String> name = SimpleMapExtractor.extract("name");
-		BinaryExtractor<ByteBuffer> blob = SimpleMapExtractor.extract("binary");
+		BinaryExtractor<String> name = MapExtractor.extract("name");
+		BinaryExtractor<ByteBuffer> blob = MapExtractor.extract("binary");
 
 		BinaryExtractor<String> keyField = ProtoBufExtractor.string(1);
 		BinaryExtractor<Long> valueField = chain(ProtoBufExtractor.path(2),new BlobLength());

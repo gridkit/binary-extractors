@@ -11,27 +11,27 @@ import java.util.Map;
  * @param <In>
  * @param <Out>
  */
-public class SimpleMapExtractor<In extends Map<?, Out>, Out> extends AbstractValueTransformer<In, Out> {
+public class MapExtractor<In extends Map<?, Out>, Out> extends AbstractValueTransformer<In, Out> {
 
 	private static final long serialVersionUID = 20131021L;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <T> SimpleMapExtractor<Map<?, T>, T> extract(BinaryExtractor<? extends Map<?, ?>> source, Object key) {
-		return new SimpleMapExtractor(source, key);
+	public static <T> MapExtractor<Map<?, T>, T> extract(BinaryExtractor<? extends Map<?, ?>> source, Object key) {
+		return new MapExtractor(source, key);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <T> SimpleMapExtractor<Map<?, T>, T> extract(Object key) {
-		return new SimpleMapExtractor(VerbatimExtractor.INSTANCE, key);
+	public static <T> MapExtractor<Map<?, T>, T> extract(Object key) {
+		return new MapExtractor(VerbatimExtractor.INSTANCE, key);
 	}
 	
 	private Object key;
 	
-	public SimpleMapExtractor() {
+	public MapExtractor() {
 		super(null);
 	}
 
-	public SimpleMapExtractor(BinaryExtractor<In> sourceExtractor, Object key) {
+	public MapExtractor(BinaryExtractor<In> sourceExtractor, Object key) {
 		super(sourceExtractor);
 		this.key = key;
 	}
@@ -58,7 +58,7 @@ public class SimpleMapExtractor<In extends Map<?, Out>, Out> extends AbstractVal
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SimpleMapExtractor other = (SimpleMapExtractor) obj;
+		MapExtractor other = (MapExtractor) obj;
 		if (key == null) {
 			if (other.key != null)
 				return false;
