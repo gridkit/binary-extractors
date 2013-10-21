@@ -1,7 +1,6 @@
 package org.gridkit.data.extractors.common;
 
 import java.io.Serializable;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -173,14 +172,14 @@ public class CompositeExtractorSet implements BinaryExtractorSet, Serializable {
 	}
 
 	@Override
-	public void extractAll(ByteBuffer buffer, VectorResultReceiver resultReceiver) {
+	public void extractAll(Object source, VectorResultReceiver resultReceiver) {
 		if (!compiled) {
 			throw new IllegalStateException("Extractor set is not compiled");
 		}
 		ExtractionContext context = newContext(resultReceiver);
 		
 		for(Batch batch: batches) {
-			batch.exec(buffer, context);
+			batch.exec(source, context);
 		}
 		
 		for(Composition c: compositions) {
@@ -220,8 +219,8 @@ public class CompositeExtractorSet implements BinaryExtractorSet, Serializable {
 		BinaryExtractorSet extractorSet;
 
 		
-		public void exec(ByteBuffer buffer, final ExtractionContext context) {
-			extractorSet.extractAll(buffer, new VectorResultReceiver() {
+		public void exec(Object source, final ExtractionContext context) {
+			extractorSet.extractAll(source, new VectorResultReceiver() {
 				@Override
 				public void push(int id, Object part) {
 					outLinks[id].push(context, part);

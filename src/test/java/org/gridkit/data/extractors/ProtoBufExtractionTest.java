@@ -1,18 +1,21 @@
 package org.gridkit.data.extractors;
 
+import static org.gridkit.data.extractors.common.Extractors.chain;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import org.gridkit.data.extractors.common.AbstractValueTransformer;
 import org.gridkit.data.extractors.common.BinaryExtractor;
-import org.gridkit.data.extractors.common.FilterExtractor;
 import org.gridkit.data.extractors.common.Blob;
 import org.gridkit.data.extractors.common.ChainedBinaryExtractor;
 import org.gridkit.data.extractors.common.ComparisonPredicate;
 import org.gridkit.data.extractors.common.ConstExtractor;
 import org.gridkit.data.extractors.common.EqualsPredicate;
 import org.gridkit.data.extractors.common.Extractors;
+import org.gridkit.data.extractors.common.FilterExtractor;
 import org.gridkit.data.extractors.common.ListCollector;
+import org.gridkit.data.extractors.common.SimpleMapExtractor;
 import org.gridkit.data.extractors.common.VerbatimExtractor;
 import org.gridkit.data.extractors.protobuf.ProtoBufExtractor;
 import org.junit.Test;
@@ -314,6 +317,34 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		addExtractor("get(B)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), propBFilter));
 		addExtractor("getAll(XX)", ListCollector.wrap(ChainedBinaryExtractor.chain(ProtoBufExtractor.newBinaryExtractor(1), propXXFilter)));
 		extract(getBytes("protobuf/TextProperties-2.bin"));
+		assertValue("get(A)", 3l);
+		assertValue("get(B)", 3l);
+		assertValue("getAll(XX)", Arrays.asList(2l, 2l, 2l, 2l, 2l));
+	}
+
+	@Test
+	public void extract_from_composite_source() {
+		BinaryExtractor<String> name = SimpleMapExtractor.extract("name");
+		BinaryExtractor<ByteBuffer> blob = SimpleMapExtractor.extract("binary");
+
+		BinaryExtractor<String> keyField = ProtoBufExtractor.string(1);
+		BinaryExtractor<Long> valueField = chain(ProtoBufExtractor.path(2),new BlobLength());
+		
+		BinaryExtractor<Boolean> keyAPred = new EqualsPredicate(keyField, ConstExtractor.newConst("A"));
+		BinaryExtractor<Boolean> keyBPred = new EqualsPredicate(keyField, ConstExtractor.newConst("B"));
+		BinaryExtractor<Boolean> keyXXPred = new EqualsPredicate(keyField, ConstExtractor.newConst("XX"));
+		
+		FilterExtractor<Long> propAFilter = new FilterExtractor<Long>(keyAPred, valueField);
+		FilterExtractor<Long> propBFilter = new FilterExtractor<Long>(keyBPred, valueField);
+		FilterExtractor<Long> propXXFilter = new FilterExtractor<Long>(keyXXPred, valueField);
+		
+		addExtractor("$name", name);
+		addExtractor("get(A)", chain(blob, ProtoBufExtractor.path(1), propAFilter));
+		addExtractor("get(B)", chain(blob, ProtoBufExtractor.path(1), propBFilter));
+		addExtractor("getAll(XX)", chain(blob, ListCollector.wrap(chain(ProtoBufExtractor.newBinaryExtractor(1), propXXFilter))));
+//		dump();
+		extractNamed("TextProperties-2.bin", getBytes("protobuf/TextProperties-2.bin"));
+		assertValue("$name", "TextProperties-2.bin");
 		assertValue("get(A)", 3l);
 		assertValue("get(B)", 3l);
 		assertValue("getAll(XX)", Arrays.asList(2l, 2l, 2l, 2l, 2l));

@@ -61,8 +61,8 @@ public final class VerbatimExtractor implements BinaryExtractor<ByteBuffer>, Ser
 		}
 
 		@Override
-		protected Object extract(ByteBuffer buffer) {
-			return buffer.slice();
+		protected Object extract(Object buffer) {
+			return buffer;
 		}
 
 		@Override

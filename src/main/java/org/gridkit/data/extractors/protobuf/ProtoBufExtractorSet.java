@@ -37,9 +37,16 @@ public class ProtoBufExtractorSet implements BinaryExtractorSet {
 	}
 
 	@Override
-	public void extractAll(ByteBuffer buffer, VectorResultReceiver resultReceiver) {
+	public void extractAll(Object source, VectorResultReceiver resultReceiver) {
+		ByteBuffer bb;
 		try {
-			ProtoBufCodedStream cis = PBHelper.inputStream(buffer);
+			bb = (ByteBuffer)source;
+			bb = bb.slice();
+		} catch (ClassCastException e) {
+			throw new ClassCastException("ProtoBufExtractorSet can be applied only to ByteBuffer object");
+		}
+		try {
+			ProtoBufCodedStream cis = PBHelper.inputStream(bb);
 			root.extractAll(cis, resultReceiver);
 		} catch (IOException e) {
 			throw new RuntimeException(e);

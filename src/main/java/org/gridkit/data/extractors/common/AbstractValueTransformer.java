@@ -14,7 +14,6 @@ public abstract class AbstractValueTransformer<InType, OutType> extends Abstract
 	
 	private static final long serialVersionUID = 20130609L;
 
-	/** Should not be null */
 	protected BinaryExtractor<InType> sourceExtractor;
 
 	public AbstractValueTransformer() {

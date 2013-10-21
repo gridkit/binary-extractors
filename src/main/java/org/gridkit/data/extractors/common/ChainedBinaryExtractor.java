@@ -12,14 +12,14 @@ public class ChainedBinaryExtractor<V> extends AbstractCompositeExtractor<V> {
 		return new ChainedBinaryExtractor<ByteBuffer>(new VerbatimExtractor(), new VerbatimExtractor());
 	}
 	
-	public static <V> ChainedBinaryExtractor<V> chain(BinaryExtractor<ByteBuffer> outter, BinaryExtractor<V> inner) {
+	public static <V> ChainedBinaryExtractor<V> chain(BinaryExtractor<?> outter, BinaryExtractor<V> inner) {
 		return new ChainedBinaryExtractor<V>(outter, inner);
 	}
 	
-	private final BinaryExtractor<ByteBuffer> outter;
+	private final BinaryExtractor<?> outter;
 	private final BinaryExtractor<V> inner;
 	
-	private ChainedBinaryExtractor(BinaryExtractor<ByteBuffer> outter, BinaryExtractor<V> inner) {
+	private ChainedBinaryExtractor(BinaryExtractor<?> outter, BinaryExtractor<V> inner) {
 		this.outter = outter;
 		this.inner = inner;
 	}

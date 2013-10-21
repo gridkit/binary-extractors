@@ -1,6 +1,5 @@
 package org.gridkit.data.extractors.common;
 
-import java.nio.ByteBuffer;
 
 public interface BinaryExtractorSet {
 	
@@ -18,6 +17,6 @@ public interface BinaryExtractorSet {
 	
 	public void dump(StringBuilder builder);
 	
-	public void extractAll(ByteBuffer buffer, VectorResultReceiver resultReceiver);
+	public void extractAll(Object source, VectorResultReceiver resultReceiver);
 
 }

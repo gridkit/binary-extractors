@@ -1,7 +1,6 @@
 package org.gridkit.data.extractors.common;
 
 import java.io.Serializable;
-import java.nio.ByteBuffer;
 
 /**
  * Forces extractor to use separate {@link BinaryExtractorSet}.
@@ -102,8 +101,8 @@ public class HeavyExtractorWrapper<V> implements BinaryExtractor<V>, Serializabl
 		}
 
 		@Override
-		public void extractAll(ByteBuffer buffer, VectorResultReceiver resultReceiver) {
-			delegate.extractAll(buffer, resultReceiver);
+		public void extractAll(Object source, VectorResultReceiver resultReceiver) {
+			delegate.extractAll(source, resultReceiver);
 		}
 	}
 }

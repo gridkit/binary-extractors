@@ -30,6 +30,15 @@ abstract class BaseExtractionAssertTest implements VectorResultReceiver {
 		extractorSet.compile();
 		extractorSet.extractAll(ByteBuffer.wrap(data), this);
 	}
+
+	protected void extractNamed(String name, byte[] data) {
+		resultMap.clear();
+		extractorSet.compile();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("name", name);
+		map.put("binary", ByteBuffer.wrap(data));
+		extractorSet.extractAll(map, this);
+	}
 	
 	protected void dump() {
 		extractorSet.compile();

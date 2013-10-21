@@ -7,12 +7,12 @@ import java.util.regex.Pattern;
 public class Extractors {
 
 	@SuppressWarnings("unchecked")
-	public static <V> V extract(ByteBuffer binary, BinaryExtractor<V> extractor) {
+	public static <V> V extract(Object source, BinaryExtractor<V> extractor) {
 		BinaryExtractorSet set = extractor.newExtractorSet();
 		final int id = set.addExtractor(extractor);
 		set.compile();
 		final Object[] result = new Object[1];
-		set.extractAll(binary, new VectorResultReceiver() {
+		set.extractAll(source, new VectorResultReceiver() {
 			@Override
 			public void push(int pid, Object part) {
 				if (id == pid) {
@@ -27,7 +27,7 @@ public class Extractors {
 		return (V) result[0];
 	}	
 
-	public static Object[] extractAll(ByteBuffer binary, BinaryExtractor<?>... extractors) {
+	public static Object[] extractAll(Object source, BinaryExtractor<?>... extractors) {
 		CompositeExtractorSet set = new CompositeExtractorSet();
 		final int[] idmap = new int[extractors.length];
 		for(int i = 0; i != idmap.length; ++i) {
@@ -35,7 +35,7 @@ public class Extractors {
 		}
 		
 		final Object[] result = new Object[idmap.length];
-		set.extractAll(binary, new VectorResultReceiver() {
+		set.extractAll(source, new VectorResultReceiver() {
 			@Override
 			public void push(int pid, Object part) {
 				for(int i = 0; i != idmap.length; ++i) {
@@ -48,6 +48,27 @@ public class Extractors {
 		return result;
 	}	
 	
+	/**
+	 * Creates empty {@link ChainedBinaryExtractor}, useful for building extractor using method chaining.
+	 */
+	public static ChainedBinaryExtractor<ByteBuffer> chain() {
+		return  ChainedBinaryExtractor.chain();
+	}
+	
+	/**
+	 * Composes two extractor using {@link ChainedBinaryExtractor}.
+	 */
+	public static <V> ChainedBinaryExtractor<V> chain(BinaryExtractor<?> outter, BinaryExtractor<V> inner) {
+		return  ChainedBinaryExtractor.chain(outter, inner);
+	}
+
+	/**
+	 * Composes two extractor using {@link ChainedBinaryExtractor}.
+	 */
+	public static <V> ChainedBinaryExtractor<V> chain(BinaryExtractor<?> outter, BinaryExtractor<?> mid, BinaryExtractor<V> inner) {
+		return  ChainedBinaryExtractor.chain(outter, mid).chain(inner);
+	}
+
 	public static BinaryExtractor<ByteBuffer> filter(BinaryExtractor<Boolean> predicate) {
 		return new FilterExtractor<ByteBuffer>(predicate, VerbatimExtractor.INSTANCE); 
 	}

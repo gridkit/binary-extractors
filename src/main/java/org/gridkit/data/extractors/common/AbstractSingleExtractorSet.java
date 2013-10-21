@@ -1,6 +1,5 @@
 package org.gridkit.data.extractors.common;
 
-import java.nio.ByteBuffer;
 
 public abstract class AbstractSingleExtractorSet implements BinaryExtractorSet {
 
@@ -36,9 +35,9 @@ public abstract class AbstractSingleExtractorSet implements BinaryExtractorSet {
 	}
 
 	@Override
-	public void extractAll(ByteBuffer buffer, VectorResultReceiver resultReceiver) {
-		resultReceiver.push(0, extract(buffer));		
+	public void extractAll(Object source, VectorResultReceiver resultReceiver) {
+		resultReceiver.push(0, extract(source));		
 	}
 	
-	protected abstract Object extract(ByteBuffer buffer);
+	protected abstract Object extract(Object source);
 }

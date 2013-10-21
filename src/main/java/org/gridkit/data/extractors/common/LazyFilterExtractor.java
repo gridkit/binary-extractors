@@ -90,6 +90,7 @@ public class LazyFilterExtractor<V> extends FilterExtractor<V> {
 		private final int id;
 		
 		public LazyExtractor(BinaryExtractor extractor) {
+			super(VerbatimExtractor.INSTANCE);
 			this.extractor = extractor;
 			this.set = extractor.newExtractorSet();
 			this.id = set.addExtractor(extractor);
