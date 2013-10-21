@@ -37,6 +37,11 @@ public class ComparisonPredicate extends AbstractCompositeExtractor<Boolean> imp
 	}
 
 	@Override
+	public Object getOperationToken() {
+		return Arrays.asList(predicateOp, comparator);
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public List<BinaryExtractor<?>> getSubExtractors() {
 		return Arrays.asList(left, right);

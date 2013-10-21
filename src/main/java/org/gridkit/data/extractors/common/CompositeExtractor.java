@@ -5,6 +5,11 @@ import java.util.List;
 
 public interface CompositeExtractor<V> extends BinaryExtractor<V> {
 
+	/**
+	 * Used to compare two extractors ignoring input parameters
+	 */
+	public Object getOperationToken();
+	
 	public List<BinaryExtractor<?>> getSubExtractors();
 	
 	public ValueComposer newComposer();

@@ -37,6 +37,11 @@ public class SimpleMapExtractor<In extends Map<?, Out>, Out> extends AbstractVal
 	}
 
 	@Override
+	public Object getOperationToken() {
+		return key;
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();

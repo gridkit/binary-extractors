@@ -19,6 +19,11 @@ public class ListCollector<V> extends AbstractCompositeExtractor<List<V>> {
 	}
 
 	@Override
+	public Object getOperationToken() {
+		return getClass();
+	}
+
+	@Override
 	public List<BinaryExtractor<?>> getSubExtractors() {
 		return Collections.<BinaryExtractor<?>>singletonList(itemExtractor);
 	}

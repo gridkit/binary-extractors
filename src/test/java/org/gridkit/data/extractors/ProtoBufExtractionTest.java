@@ -342,7 +342,7 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		addExtractor("get(A)", chain(blob, ProtoBufExtractor.path(1), propAFilter));
 		addExtractor("get(B)", chain(blob, ProtoBufExtractor.path(1), propBFilter));
 		addExtractor("getAll(XX)", chain(blob, ListCollector.wrap(chain(ProtoBufExtractor.newBinaryExtractor(1), propXXFilter))));
-//		dump();
+		dump();
 		extractNamed("TextProperties-2.bin", getBytes("protobuf/TextProperties-2.bin"));
 		assertValue("$name", "TextProperties-2.bin");
 		assertValue("get(A)", 3l);
@@ -359,6 +359,11 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 
 		public BlobLength(BinaryExtractor<ByteBuffer> sourceExtractor) {
 			super(sourceExtractor);
+		}
+
+		@Override
+		public Object getOperationToken() {
+			return getClass();
 		}
 
 		@Override
@@ -381,6 +386,11 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		
 		public StringToInt(BinaryExtractor<String> sourceExtractor) {
 			super(sourceExtractor);
+		}
+		
+		@Override
+		public Object getOperationToken() {
+			return getClass();
 		}
 		
 		@Override

@@ -16,6 +16,11 @@ public class EqualsPredicate extends AbstractCompositeExtractor<Boolean> {
 	}
 
 	@Override
+	public Object getOperationToken() {
+		return getClass();
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public List<BinaryExtractor<?>> getSubExtractors() {
 		return Arrays.asList(left, right);

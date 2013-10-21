@@ -16,7 +16,12 @@ public class ConstExtractor<V> extends AbstractCompositeExtractor<V> {
 	public ConstExtractor(V value) {
 		this.value = value;
 	}
-	
+
+	@Override
+	public Object getOperationToken() {
+		return value;
+	}
+
 	@Override
 	public List<BinaryExtractor<?>> getSubExtractors() {
 		return Collections.emptyList();

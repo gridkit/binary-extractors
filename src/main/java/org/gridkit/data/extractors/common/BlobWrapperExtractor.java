@@ -19,6 +19,11 @@ public class BlobWrapperExtractor extends AbstractValueTransformer<Object, Blob>
 	}
 
 	@Override
+	public Object getOperationToken() {
+		return getClass();
+	}
+
+	@Override
 	protected Blob transform(Object input) {
 		if (input instanceof Blob) {
 			return (Blob)input;

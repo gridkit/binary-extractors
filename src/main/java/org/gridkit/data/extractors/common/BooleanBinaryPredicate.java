@@ -29,6 +29,11 @@ public class BooleanBinaryPredicate extends AbstractBinaryFunction<Boolean, Bool
 	}
 
 	@Override
+	public Object getOperationToken() {
+		return op;
+	}
+
+	@Override
 	protected Boolean evaluate(Boolean left, Boolean right) {
 		switch(op) {
 		case AND: return left && right;

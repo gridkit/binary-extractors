@@ -1,10 +1,9 @@
 package org.gridkit.data.extractors.common;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.util.Collections;
-import java.util.List;
 
-public class ChainedBinaryExtractor<V> extends AbstractCompositeExtractor<V> {
+public class ChainedBinaryExtractor<V> implements BinaryExtractor<V>, ExtractorChain, Serializable {
 	
 	private static final long serialVersionUID = 20130205L;
 	
@@ -13,7 +12,12 @@ public class ChainedBinaryExtractor<V> extends AbstractCompositeExtractor<V> {
 	}
 	
 	public static <V> ChainedBinaryExtractor<V> chain(BinaryExtractor<?> outter, BinaryExtractor<V> inner) {
-		return new ChainedBinaryExtractor<V>(outter, inner);
+		if (outter.canPushDown(inner)) {
+			return new ChainedBinaryExtractor<V>(outter.pushDown(inner), null);
+		}
+		else {
+			return new ChainedBinaryExtractor<V>(outter, inner);
+		}
 	}
 	
 	private final BinaryExtractor<?> outter;
@@ -24,59 +28,55 @@ public class ChainedBinaryExtractor<V> extends AbstractCompositeExtractor<V> {
 		this.inner = inner;
 	}
 
-	@SuppressWarnings("unchecked")
 	public <VV> ChainedBinaryExtractor<VV> chain(BinaryExtractor<VV> tail) {
-		if (inner.canPushDown(tail)) {
-			BinaryExtractor<VV> ninner = inner.pushDown(tail);
-			if (outter.canPushDown(ninner)) {
-				return chain(VerbatimExtractor.INSTANCE, outter.pushDown(ninner));
-			}
-			else {
-				return new ChainedBinaryExtractor<VV>(outter, ninner);
-			}
-		}
-		else {
-			return chain((ChainedBinaryExtractor<ByteBuffer>)this, tail);
-		}
+		return chain(this, tail);
 	}
-	
+
+	@Override
+	public BinaryExtractorSet newExtractorSet() {
+		return new CompositeExtractorSet();
+	}
+
+	@Override
+	public boolean isCompatible(BinaryExtractorSet set) {
+		return set instanceof CompositeExtractorSet;
+	}
+
 	@Override
 	public boolean canPushDown(BinaryExtractor<?> nested) {
-		return inner.canPushDown(nested);
+		if (inner == null) {
+			return true;
+		}
+		else {
+			return inner.canPushDown(nested);
+		}
 	}
 
 	@Override
 	public <VV> BinaryExtractor<VV> pushDown(BinaryExtractor<VV> nested) {
-		BinaryExtractor<VV> ninner = inner.pushDown(nested);
-		if (outter.canPushDown(ninner)) {
-			return outter.pushDown(ninner);
+		if (inner == null) {
+			if (outter.canPushDown(nested)) {
+				return new ChainedBinaryExtractor<VV>(outter.pushDown(nested), null);
+			}
+			else {
+				return new ChainedBinaryExtractor<VV>(outter, nested);
+			}
 		}
 		else {
-			return new ChainedBinaryExtractor<VV>(outter, ninner);
+			return new ChainedBinaryExtractor<VV>(outter, inner.pushDown(nested));
 		}
 	}
 
 	@Override
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	public List<BinaryExtractor<?>> getSubExtractors() {
-		if (outter.canPushDown(inner)) {
-			return (List)Collections.singletonList(outter.pushDown(inner));
-		}
-		else {
-			return (List)Collections.singletonList(outter);
-		}
+	public BinaryExtractor<?> getHead() {
+		return outter;
 	}
 
 	@Override
-	public ValueComposer newComposer() {
-		if (outter.canPushDown(inner)) {
-			return new AsIsComposer();
-		}
-		else {
-			return new ChainComposer(inner);
-		}
+	public BinaryExtractor<?> getTail() {
+		return inner;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -111,26 +111,6 @@ public class ChainedBinaryExtractor<V> extends AbstractCompositeExtractor<V> {
 
 	@Override
 	public String toString() {
-		return outter + "/" + inner;
-	}
-
-	private static class ChainComposer extends AsIsComposer {
-
-		private final BinaryExtractor<?> extractor;
-		
-		private ChainComposer(BinaryExtractor<?> extractor) {
-			this.extractor = extractor;
-		}
-
-		@Override
-		public void push(int id, Object part) {
-			if (id == 0) {
-				ByteBuffer binary = (ByteBuffer) part;
-				super.push(0,Extractors.extract(binary, extractor));
-			}
-			else {
-				throw new IllegalArgumentException("No such parameter: " + id);
-			}
-		}
+		return outter + (inner != null ? ("/" + inner) : "");
 	}
 }

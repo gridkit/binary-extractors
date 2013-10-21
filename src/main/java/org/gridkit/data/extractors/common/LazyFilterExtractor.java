@@ -98,6 +98,11 @@ public class LazyFilterExtractor<V> extends FilterExtractor<V> {
 		}
 
 		@Override
+		public Object getOperationToken() {
+			return this;
+		}
+
+		@Override
 		protected Lazy transform(ByteBuffer buffer) {
 			return new Lazy(set, id, buffer);
 		}

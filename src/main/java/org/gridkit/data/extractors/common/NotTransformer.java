@@ -16,6 +16,11 @@ public class NotTransformer extends AbstractValueTransformer<Boolean, Boolean> {
 	}
 
 	@Override
+	public Object getOperationToken() {
+		return getClass();
+	}
+
+	@Override
 	protected Boolean transform(Boolean input) {
 		return Boolean.valueOf(!input.booleanValue());
 	}

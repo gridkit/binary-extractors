@@ -24,6 +24,11 @@ public class FilterExtractor<V> extends AbstractCompositeExtractor<V> {
 	}
 
 	@Override
+	public Object getOperationToken() {
+		return this;
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public List<BinaryExtractor<?>> getSubExtractors() {
 		return Arrays.asList(predicate, wrapProcessor(processor));
