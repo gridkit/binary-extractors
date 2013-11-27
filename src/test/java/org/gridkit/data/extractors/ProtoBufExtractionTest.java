@@ -210,16 +210,21 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 
 		BinaryExtractor<Boolean> keyAPred = new EqualsPredicate(keyField, ConstExtractor.newConst("A"));
 		BinaryExtractor<Boolean> keyBPred = new EqualsPredicate(keyField, ConstExtractor.newConst("B"));
+		BinaryExtractor<Boolean> value_bbb_Pred = new EqualsPredicate(valueField, ConstExtractor.newConst("bbb"));
 		
 		FilterExtractor<String> keyAFilter = new FilterExtractor<String>(keyAPred, valueField);
 		FilterExtractor<String> keyBFilter = new FilterExtractor<String>(keyBPred, valueField);
+		FilterExtractor<String> value_bbb_Filter = new FilterExtractor<String>(value_bbb_Pred, keyField);
 		
 		
 		addExtractor("get(A)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), keyAFilter));
 		addExtractor("get(B)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), keyBFilter));
+		addExtractor("key_by_value(bbb)", ChainedBinaryExtractor.chain(ProtoBufExtractor.path(1), value_bbb_Filter));
+//		dump();
 		extract(getBytes("protobuf/TextProperties-1.bin"));
 		assertValue("get(A)", "aaa");
 		assertValue("get(B)", "bbb");
+		assertValue("key_by_value(bbb)", "B");
 	}
 
 	@Test(expected=NumberFormatException.class)
