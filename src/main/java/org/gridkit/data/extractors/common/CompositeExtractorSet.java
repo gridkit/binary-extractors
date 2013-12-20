@@ -222,7 +222,10 @@ public class CompositeExtractorSet implements BinaryExtractorSet, Serializable {
 			throw new IllegalStateException("Extractor set is not compiled");
 		}
 		ExtractionContext context = newContext(resultReceiver);
-		new LinkRef(links.get(-1), context).push(source);
+		ValueLink sink = links.get(-1);
+		if (sink != null) {
+			new LinkRef(sink, context).push(source);
+		}
 		
 		for(Composer composer: context.composers) {
 			composer.compose(context);

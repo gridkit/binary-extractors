@@ -347,12 +347,28 @@ public class ProtoBufExtractionTest extends BaseExtractionAssertTest {
 		addExtractor("get(A)", chain(blob, ProtoBufExtractor.path(1), propAFilter));
 		addExtractor("get(B)", chain(blob, ProtoBufExtractor.path(1), propBFilter));
 		addExtractor("getAll(XX)", chain(blob, ListCollector.wrap(chain(ProtoBufExtractor.newBinaryExtractor(1), propXXFilter))));
-		dump();
+//		dump();
 		extractNamed("TextProperties-2.bin", getBytes("protobuf/TextProperties-2.bin"));
 		assertValue("$name", "TextProperties-2.bin");
 		assertValue("get(A)", 3l);
 		assertValue("get(B)", 3l);
 		assertValue("getAll(XX)", Arrays.asList(2l, 2l, 2l, 2l, 2l));
+	}
+
+	/**
+	 * Edge case extractor not inspecting value
+	 */
+	@Test
+	public void extract_constant() {
+		BinaryExtractor<String> test = ConstExtractor.newConst("test");
+		BinaryExtractor<Boolean> testCond = new EqualsPredicate(test, test);
+
+		addExtractor("test", test);
+		addExtractor("test == test", testCond);
+		dump();
+		extractNamed("TextProperties-2.bin", getBytes("protobuf/TextProperties-2.bin"));
+		assertValue("test", "test");
+		assertValue("test == test", Boolean.TRUE);
 	}
 	
 	@SuppressWarnings("serial")
