@@ -1,7 +1,7 @@
 Binary Extractor
 =========
 
-Influenced by POF extractors concent introduced in Oracle Coherence,
+Influenced by POF extractors concept introduced in Oracle Coherence,
 this library offers framework to build complex extractors/predicates
 accessing data in serialized form of object without its deserialization.
 
